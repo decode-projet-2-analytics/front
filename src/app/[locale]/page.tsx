@@ -1,6 +1,7 @@
-import { getTranslations } from "next-intl/server";
+import LoginForm from "../components/LoginForm";
+import { useTranslations } from "next-intl";
 
 export default async function Page() {
-  const t = await getTranslations("Home");
+  const t = await useTranslations("Home");
   return <div>{t("title")}</div>;
 }
