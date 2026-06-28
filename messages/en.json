@@ -1,5 +1,77 @@
 {
-    "Home": {
-        "title": "Hello World"
+  "Common": {
+    "language": "Language"
+  },
+  "Backoffice": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "backToSite": "Back to site"
+    },
+    "footer": {
+      "copyright": "© {year} decode-analytics. All rights reserved."
     }
+  },
+  "Landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "login": "Sign in",
+      "getStarted": "Get started"
+    },
+    "hero": {
+      "badge": "Real-time behavioral analytics",
+      "title": "Understand your users, as it happens",
+      "subtitle": "decode-analytics captures navigation, clicks, and server events to deliver a customizable real-time dashboard — KPIs, charts, and heatmaps included.",
+      "ctaPrimary": "Create an account",
+      "ctaSecondary": "Sign in"
+    },
+    "features": {
+      "title": "Everything you need to analyze behavior",
+      "subtitle": "A modular backoffice designed for webmasters who want precise data without the complexity.",
+      "items": {
+        "kpi": {
+          "title": "Custom KPIs",
+          "description": "Track unique visitors, conversion rates, or any metric. Display absolute values or rates, filtered by tags and time range."
+        },
+        "realtime": {
+          "title": "Real-time updates",
+          "description": "Widgets refresh instantly via WebSocket. No manual refresh — your data stays live as events flow in."
+        },
+        "heatmap": {
+          "title": "Click heatmaps",
+          "description": "Visualize where users click on your pages. Overlay heat intensity on a page screenshot for quick UX insights."
+        },
+        "sdk": {
+          "title": "Lightweight SDK",
+          "description": "Integrate in minutes with our front and back SDKs. Secure via APP_ID, CORS, and HMAC signatures."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Up and running in 3 steps",
+      "subtitle": "From integration to insights, decode-analytics stays simple.",
+      "steps": {
+        "integrate": {
+          "title": "Integrate the SDK",
+          "description": "Add the front SDK to your site and the back SDK to your server. Generate your credentials in one click."
+        },
+        "configure": {
+          "title": "Configure tracking",
+          "description": "Create tags and conversion funnels. Define what matters for your business."
+        },
+        "analyze": {
+          "title": "Build your dashboard",
+          "description": "Add widgets, set your filters, and watch your data update in real time."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to decode your audience?",
+      "subtitle": "Create your webmaster account and start tracking in minutes.",
+      "button": "Get started for free"
+    },
+    "footer": {
+      "copyright": "© {year} decode-analytics. All rights reserved."
+    }
+  }
 }

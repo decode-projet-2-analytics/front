@@ -1,5 +1,77 @@
 {
-    "Home": {
-        "title": "Bonjour le monde"
+  "Common": {
+    "language": "Langue"
+  },
+  "Backoffice": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "backToSite": "Retour au site"
+    },
+    "footer": {
+      "copyright": "© {year} decode-analytics. Tous droits réservés."
     }
+  },
+  "Landing": {
+    "nav": {
+      "features": "Fonctionnalités",
+      "howItWorks": "Comment ça marche",
+      "login": "Se connecter",
+      "getStarted": "Commencer"
+    },
+    "hero": {
+      "badge": "Analytics comportementale en temps réel",
+      "title": "Comprenez vos utilisateurs, en direct",
+      "subtitle": "decode-analytics capture la navigation, les clics et les événements serveur pour vous offrir un dashboard personnalisable en temps réel — KPIs, graphiques et heatmaps inclus.",
+      "ctaPrimary": "Créer un compte",
+      "ctaSecondary": "Se connecter"
+    },
+    "features": {
+      "title": "Tout pour analyser le comportement",
+      "subtitle": "Un backoffice modulaire pensé pour les webmasters qui veulent des données précises, sans la complexité.",
+      "items": {
+        "kpi": {
+          "title": "KPIs personnalisés",
+          "description": "Suivez les visiteurs uniques, taux de conversion ou toute métrique. Affichage en nombre absolu ou en taux, filtré par tags et période."
+        },
+        "realtime": {
+          "title": "Mise à jour temps réel",
+          "description": "Les widgets se rafraîchissent instantanément via WebSocket. Pas de rechargement manuel — vos données restent live."
+        },
+        "heatmap": {
+          "title": "Heatmaps de clics",
+          "description": "Visualisez où vos utilisateurs cliquent sur vos pages. Superposition de l'intensité sur une capture pour des insights UX rapides."
+        },
+        "sdk": {
+          "title": "SDK léger",
+          "description": "Intégrez en quelques minutes avec nos SDK front et back. Sécurisé via APP_ID, CORS et signatures HMAC."
+        }
+      }
+    },
+    "howItWorks": {
+      "title": "Opérationnel en 3 étapes",
+      "subtitle": "De l'intégration aux insights, decode-analytics reste simple.",
+      "steps": {
+        "integrate": {
+          "title": "Intégrez le SDK",
+          "description": "Ajoutez le SDK front sur votre site et le SDK back sur votre serveur. Générez vos credentials en un clic."
+        },
+        "configure": {
+          "title": "Configurez le tracking",
+          "description": "Créez des tags et des tunnels de conversion. Définissez ce qui compte pour votre activité."
+        },
+        "analyze": {
+          "title": "Construisez votre dashboard",
+          "description": "Ajoutez des widgets, paramétrez vos filtres et observez vos données se mettre à jour en temps réel."
+        }
+      }
+    },
+    "cta": {
+      "title": "Prêt à décoder votre audience ?",
+      "subtitle": "Créez votre compte webmaster et commencez le tracking en quelques minutes.",
+      "button": "Commencer gratuitement"
+    },
+    "footer": {
+      "copyright": "© {year} decode-analytics. Tous droits réservés."
+    }
+  }
 }
