@@ -1,11 +1,13 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { setToken } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
 
 export default function LoginForm() {
+  const t = useTranslations("Auth.login");
   const router = useRouter();
   const [error, setError] = useState("");
 
@@ -24,7 +26,7 @@ export default function LoginForm() {
     });
 
     if (!response.ok) {
-      setError("Email ou mot de passe incorrect.");
+      setError(t("error"));
       return;
     }
 
@@ -38,14 +40,14 @@ export default function LoginForm() {
       <input
         name="email"
         type="email"
-        placeholder="Email"
+        placeholder={t("email")}
         required
         className="w-full rounded-md border border-border bg-surface-2 px-3 py-2 text-sm"
       />
       <input
         name="password"
         type="password"
-        placeholder="Mot de passe"
+        placeholder={t("password")}
         required
         className="w-full rounded-md border border-border bg-surface-2 px-3 py-2 text-sm"
       />
@@ -54,7 +56,7 @@ export default function LoginForm() {
         type="submit"
         className="w-full rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover"
       >
-        Se connecter
+        {t("submit")}
       </button>
     </form>
   );

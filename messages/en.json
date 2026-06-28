@@ -2,6 +2,24 @@
   "Common": {
     "language": "Language"
   },
+  "Auth": {
+    "login": {
+      "title": "Sign in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "error": "Incorrect email or password."
+    },
+    "register": {
+      "title": "Sign up",
+      "firstname": "First name",
+      "lastname": "Last name",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign up",
+      "error": "Something went wrong. Please try again."
+    }
+  },
   "Backoffice": {
     "nav": {
       "dashboard": "Dashboard",
