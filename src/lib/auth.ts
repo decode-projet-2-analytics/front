@@ -1,3 +1,5 @@
+import { cookies } from "next/headers";
+
 const TOKEN_COOKIE = "accessToken";
 
 function getCookie(name: string): string | null {
@@ -7,6 +9,8 @@ function getCookie(name: string): string | null {
 }
 
 export const getToken = () => getCookie(TOKEN_COOKIE);
+
+export const getTokenServer = async () => (await cookies()).get(TOKEN_COOKIE)?.value;
 
 export const setToken = (token: string) => {
   document.cookie = `${TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; SameSite=Lax`;
