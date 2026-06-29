@@ -23,10 +23,32 @@
   "Backoffice": {
     "nav": {
       "dashboard": "Dashboard",
+      "adminUsers": "Webmasters",
       "backToSite": "Back to site"
     },
     "footer": {
       "copyright": "© {year} decode-analytics. All rights reserved."
+    }
+  },
+  "Admin": {
+    "users": {
+      "title": "Webmaster management",
+      "filterAll": "All",
+      "filterPending": "Pending",
+      "filterValidated": "Validated",
+      "filterRejected": "Rejected",
+      "validate": "Validate",
+      "reject": "Reject",
+      "noUsers": "No users found.",
+      "updateError": "Failed to update status.",
+      "colCompany": "Company",
+      "colEmail": "Email",
+      "colPhone": "Phone",
+      "colStatus": "Status",
+      "colActions": "Actions",
+      "status_pending": "Pending",
+      "status_validated": "Validated",
+      "status_rejected": "Rejected"
     }
   },
   "Landing": {

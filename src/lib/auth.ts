@@ -1,5 +1,3 @@
-import { cookies } from "next/headers";
-
 const TOKEN_COOKIE = "accessToken";
 
 function getCookie(name: string): string | null {
@@ -10,7 +8,10 @@ function getCookie(name: string): string | null {
 
 export const getToken = () => getCookie(TOKEN_COOKIE);
 
-export const getTokenServer = async () => (await cookies()).get(TOKEN_COOKIE)?.value;
+export const getTokenServer = async () => {
+  const { cookies } = await import("next/headers");
+  return (await cookies()).get(TOKEN_COOKIE)?.value;
+};
 
 export const setToken = (token: string) => {
   document.cookie = `${TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; SameSite=Lax`;
@@ -19,3 +20,16 @@ export const setToken = (token: string) => {
 export const removeToken = () => {
   document.cookie = `${TOKEN_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
 };
+
+export async function getServerRole(): Promise<string | null> {
+  const token = await getTokenServer();
+  if (!token) return null;
+  try {
+    const payload = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64url").toString("utf-8")
+    );
+    return payload.role ?? null;
+  } catch {
+    return null;
+  }
+}

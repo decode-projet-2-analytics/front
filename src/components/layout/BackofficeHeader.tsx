@@ -4,7 +4,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import Logo from "./Logo";
 
-export default function BackofficeHeader() {
+interface Props {
+  isAdmin?: boolean;
+}
+
+export default function BackofficeHeader({ isAdmin = false }: Props) {
   const t = useTranslations("Backoffice");
 
   return (
@@ -18,6 +22,14 @@ export default function BackofficeHeader() {
           >
             {t("nav.dashboard")}
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin/users"
+              className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
+            >
+              {t("nav.adminUsers")}
+            </Link>
+          )}
           <Link
             href="/"
             className="text-sm text-foreground-muted transition-colors hover:text-foreground"
