@@ -22,7 +22,7 @@ export interface AdminUser {
 export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]> {
   const token = await getTokenServer();
 
-  const url = new URL(`${BASE_URL}/api/v1/admin/users`);
+  const url = new URL(`${BASE_URL}/admin/users`);
   if (status) url.searchParams.set("status", status);
 
   const res = await fetch(url.toString(), {
@@ -30,7 +30,24 @@ export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]>
     cache: "no-store",
   });
 
-  if (!res.ok) return [];
+  if (!res.ok) {
+    console.error(`fetchAdminUsers failed: ${res.status} ${res.statusText}`);
+    return [];
+  }
+  return res.json();
+}
+
+export async function impersonateUser(
+  userId: number
+): Promise<{ token: string } | null> {
+  const token = await getTokenServer();
+
+  const res = await fetch(`${BASE_URL}/admin/impersonate/${userId}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!res.ok) return null;
   return res.json();
 }
 
@@ -41,7 +58,7 @@ export async function updateUserStatus(
 ): Promise<{ ok: boolean }> {
   const token = await getTokenServer();
 
-  const res = await fetch(`${BASE_URL}/api/v1/admin/users/${userId}/status`, {
+  const res = await fetch(`${BASE_URL}/admin/users/${userId}/status`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { fetchAdminUsers, type UserStatus } from "@/lib/adminApi";
 import UserStatusActions from "@/components/admin/UserStatusActions";
+import ImpersonateButton from "@/components/admin/ImpersonateButton";
 
 const STATUS_FILTERS: Array<{ key: UserStatus | "all"; label: string }> = [
   { key: "all", label: "filterAll" },
@@ -33,7 +34,6 @@ export default async function AdminUsersPage({ searchParams }: Props) {
     <div className="flex flex-1 flex-col px-6 py-8 max-w-5xl mx-auto w-full">
       <h1 className="text-2xl font-semibold mb-6">{t("title")}</h1>
 
-      {/* Filtres */}
       <div className="flex gap-2 mb-6">
         {STATUS_FILTERS.map(({ key, label }) => {
           const active = key === "all" ? !validStatus : validStatus === key;
@@ -53,7 +53,6 @@ export default async function AdminUsersPage({ searchParams }: Props) {
         })}
       </div>
 
-      {/* Table */}
       {users.length === 0 ? (
         <p className="text-muted text-sm">{t("noUsers")}</p>
       ) : (
@@ -65,7 +64,9 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                 <th className="px-4 py-3 font-medium">{t("colEmail")}</th>
                 <th className="px-4 py-3 font-medium">{t("colPhone")}</th>
                 <th className="px-4 py-3 font-medium">{t("colStatus")}</th>
+                <th className="px-4 py-3 font-medium">{t("colRole")}</th>
                 <th className="px-4 py-3 font-medium">{t("colActions")}</th>
+                <th className="px-4 py-3 font-medium">{t("colImpersonate")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -93,8 +94,14 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                       {t(`status_${user.status}`)}
                     </span>
                   </td>
+                  <td className="px-4 py-3 text-muted">{user.role}</td>
                   <td className="px-4 py-3">
-                    <UserStatusActions userId={user.id} currentStatus={user.status} />
+                    <UserStatusActions userId={user.id} currentStatus={user.status} role={user.role} />
+                  </td>
+                  <td className="px-4 py-3">
+                    {user.status === "validated" && user.role !== "Admin" && (
+                      <ImpersonateButton userId={user.id} />
+                    )}
                   </td>
                 </tr>
               ))}

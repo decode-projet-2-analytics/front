@@ -8,13 +8,18 @@ import { useTranslations } from "next-intl";
 interface Props {
   userId: number;
   currentStatus: UserStatus;
+  role: "Admin" | "Webmaster";
 }
 
-export default function UserStatusActions({ userId, currentStatus }: Props) {
+export default function UserStatusActions({ userId, currentStatus, role }: Props) {
   const t = useTranslations("Admin.users");
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  if (role === "Admin") {
+    return <span className="text-xs text-muted">—</span>;
+  }
 
   async function handleStatus(status: UserStatus) {
     setError(null);
@@ -53,7 +58,6 @@ export default function UserStatusActions({ userId, currentStatus }: Props) {
     );
   }
 
-  // pending
   return (
     <div className="flex gap-2 items-center">
       <button
