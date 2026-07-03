@@ -1,13 +1,14 @@
-"use client";
-
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { getTokenServer } from "@/lib/auth";
 import DashboardPreview from "@/components/landing/DashboardPreview";
 import Features from "@/components/landing/Features";
 import HowItWorks from "@/components/landing/HowItWorks";
 
-export default function LandingPage() {
-  const t = useTranslations("Landing");
+export default async function LandingPage() {
+  const t = await getTranslations("Landing");
+  const token = await getTokenServer();
+  const isAuthenticated = !!token;
 
   return (
     <div className="relative overflow-hidden">
@@ -42,20 +43,22 @@ export default function LandingPage() {
               {t("hero.subtitle")}
             </p>
 
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link
-                href="/register"
-                className="inline-flex h-11 w-full items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-hover sm:w-auto"
-              >
-                {t("hero.ctaPrimary")}
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex h-11 w-full items-center justify-center rounded-md border border-border bg-surface-1 px-6 text-sm font-medium text-foreground transition-colors hover:bg-surface-2 sm:w-auto"
-              >
-                {t("hero.ctaSecondary")}
-              </Link>
-            </div>
+            {!isAuthenticated && (
+              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                <Link
+                  href="/register"
+                  className="inline-flex h-11 w-full items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-hover sm:w-auto"
+                >
+                  {t("hero.ctaPrimary")}
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-flex h-11 w-full items-center justify-center rounded-md border border-border bg-surface-1 px-6 text-sm font-medium text-foreground transition-colors hover:bg-surface-2 sm:w-auto"
+                >
+                  {t("hero.ctaSecondary")}
+                </Link>
+              </div>
+            )}
           </div>
 
           <div className="relative mt-16 sm:mt-20">
@@ -66,21 +69,24 @@ export default function LandingPage() {
 
       <Features />
       <HowItWorks />
+      {!isAuthenticated && (
+        <section className="relative border-t border-border-subtle px-6 py-24">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {t("cta.title")}
+            </h2>
+            <p className="mt-4 text-foreground-secondary">{t("cta.subtitle")}</p>
 
-      <section className="relative border-t border-border-subtle px-6 py-24">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-            {t("cta.title")}
-          </h2>
-          <p className="mt-4 text-foreground-secondary">{t("cta.subtitle")}</p>
-          <Link
-            href="/register"
-            className="mt-8 inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
-          >
-            {t("cta.button")}
-          </Link>
-        </div>
-      </section>
+            <Link
+              href="/register"
+              className="mt-8 inline-flex h-11 items-center justify-center rounded-md bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-hover"
+            >
+              {t("cta.button")}
+            </Link>
+          </div>
+        </section>
+      )}
+
     </div>
   );
 }
