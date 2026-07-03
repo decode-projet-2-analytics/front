@@ -3,12 +3,23 @@
     "language": "Language"
   },
   "Auth": {
+    "pending": {
+      "title": "Account pending validation",
+      "subtitle": "Your request has been received. Our team will review your application and get back to you.",
+      "nextSteps": "Next steps",
+      "step1": "Check your inbox — a confirmation email has just been sent.",
+      "step2": "Our team validates your company within 24–48 hours.",
+      "step3": "Once validated, you'll be able to access your dashboard.",
+      "emailHint": "Didn't receive an email? Check your spam folder.",
+      "backToLogin": "Back to sign in"
+    },
     "login": {
       "title": "Sign in",
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",
-      "error": "Incorrect email or password."
+      "error": "Incorrect email or password.",
+      "errorRejected": "Your account has been rejected. Please contact support."
     },
     "register": {
       "title": "Sign up",
@@ -23,8 +34,7 @@
   "Backoffice": {
     "nav": {
       "dashboard": "Dashboard",
-      "adminUsers": "Webmasters",
-      "backToSite": "Back to site"
+      "adminUsers": "Webmasters"
     },
     "footer": {
       "copyright": "© {year} decode-analytics. All rights reserved."
@@ -48,15 +58,39 @@
       "colActions": "Actions",
       "status_pending": "Pending",
       "status_validated": "Validated",
-      "status_rejected": "Rejected"
+      "status_rejected": "Rejected",
+      "colImpersonate": "Impersonate",
+      "colRole": "Role"
+    },
+    "impersonate": {
+      "button": "Impersonate",
+      "banner": "You are acting as {email}",
+      "stop": "Exit",
+      "error": "Could not impersonate this user."
     }
+  },
+  "Dashboard": {
+    "greeting": "Hello, {name} 👋",
+    "profileTitle": "Your profile",
+    "fieldEmail": "Email",
+    "fieldRole": "Role",
+    "fieldCompany": "Company",
+    "fieldPhone": "Phone",
+    "fieldWebsite": "Website",
+    "fieldMember": "Member since",
+    "fieldStatus": "Account status",
+    "status_pending": "Pending",
+    "status_validated": "Validated",
+    "status_rejected": "Rejected",
+    "widgetsPlaceholder": "Your widgets will appear here — set up your first widget from the menu."
   },
   "Landing": {
     "nav": {
       "features": "Features",
       "howItWorks": "How it works",
       "login": "Sign in",
-      "getStarted": "Get started"
+      "getStarted": "Get started",
+      "logout": "Sign out"
     },
     "hero": {
       "badge": "Real-time behavioral analytics",

@@ -3,12 +3,23 @@
     "language": "Langue"
   },
   "Auth": {
+    "pending": {
+      "title": "Compte en attente de validation",
+      "subtitle": "Votre demande a bien été reçue. Notre équipe va examiner votre dossier et vous contacter.",
+      "nextSteps": "Prochaines étapes",
+      "step1": "Vérifiez votre boîte mail — un email de confirmation vient d'être envoyé.",
+      "step2": "Notre équipe valide votre entreprise sous 24–48h.",
+      "step3": "Une fois validé, vous pourrez accéder à votre dashboard.",
+      "emailHint": "Vous n'avez pas reçu d'email ? Vérifiez vos spams.",
+      "backToLogin": "Retour à la connexion"
+    },
     "login": {
       "title": "Connexion",
       "email": "Email",
       "password": "Mot de passe",
       "submit": "Se connecter",
-      "error": "Email ou mot de passe incorrect."
+      "error": "Email ou mot de passe incorrect.",
+      "errorRejected": "Votre compte a été refusé. Contactez le support."
     },
     "register": {
       "title": "Inscription",
@@ -23,8 +34,7 @@
   "Backoffice": {
     "nav": {
       "dashboard": "Dashboard",
-      "adminUsers": "Webmasters",
-      "backToSite": "Retour au site"
+      "adminUsers": "Webmasters"
     },
     "footer": {
       "copyright": "© {year} decode-analytics. Tous droits réservés."
@@ -48,15 +58,39 @@
       "colActions": "Actions",
       "status_pending": "En attente",
       "status_validated": "Validé",
-      "status_rejected": "Refusé"
+      "status_rejected": "Refusé",
+      "colImpersonate": "Impersonifier",
+      "colRole": "Role"
+    },
+    "impersonate": {
+      "button": "Impersonifier",
+      "banner": "Vous agissez en tant que {email}",
+      "stop": "Quitter",
+      "error": "Impossible d'impersonifier cet utilisateur."
     }
+  },
+  "Dashboard": {
+    "greeting": "Bonjour, {name} 👋",
+    "profileTitle": "Votre profil",
+    "fieldEmail": "Email",
+    "fieldRole": "Rôle",
+    "fieldCompany": "Société",
+    "fieldPhone": "Téléphone",
+    "fieldWebsite": "Site web",
+    "fieldMember": "Membre depuis",
+    "fieldStatus": "Statut du compte",
+    "status_pending": "En attente",
+    "status_validated": "Validé",
+    "status_rejected": "Refusé",
+    "widgetsPlaceholder": "Vos widgets apparaîtront ici — configurez votre premier widget depuis le menu."
   },
   "Landing": {
     "nav": {
       "features": "Fonctionnalités",
       "howItWorks": "Comment ça marche",
       "login": "Se connecter",
-      "getStarted": "Commencer"
+      "getStarted": "Créer un compte",
+      "logout": "Déconnexion"
     },
     "hero": {
       "badge": "Analytics comportementale en temps réel",
