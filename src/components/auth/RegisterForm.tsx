@@ -31,7 +31,7 @@ export default function RegisterForm() {
       return;
     }
 
-    router.replace("/login");
+    router.replace("/pending");
   }
 
   return (

@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { setToken } from "@/lib/auth";
+import { setToken, removeToken } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
 
 export default function LoginForm() {
@@ -17,13 +17,24 @@ export default function LoginForm() {
 
     const formData = new FormData(event.currentTarget);
 
-    const response = await apiFetch(`/login`, {
+    const response = await apiFetch(`/auth/login`, {
       method: "POST",
       body: JSON.stringify({
         email: formData.get("email"),
         password: formData.get("password"),
       }),
     });
+
+    if (response.status === 403) {
+      const body = await response.json().catch(() => ({}));
+      const message: string = body?.error?.message ?? "";
+      if (message.toLowerCase().includes("attente")) {
+        router.replace("/pending");
+      } else {
+        setError(t("errorRejected"));
+      }
+      return;
+    }
 
     if (!response.ok) {
       setError(t("error"));
@@ -32,6 +43,31 @@ export default function LoginForm() {
 
     const data: { token: string } = await response.json();
     setToken(data.token);
+
+    try {
+      const payload = JSON.parse(
+        atob(data.token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+      );
+      const sub = payload.sub;
+      const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+      const meRes = await fetch(`${BASE_URL}/users/${sub}`, {
+        headers: { Authorization: `Bearer ${data.token}` },
+      });
+      if (meRes.ok) {
+        const me = await meRes.json();
+        if (me.status === "pending") {
+          router.replace("/pending");
+          return;
+        }
+        if (me.status === "rejected") {
+          setError(t("errorRejected"));
+          removeToken();
+          return;
+        }
+      }
+    } catch {
+    }
+
     router.replace("/dashboard");
   }
 

@@ -1,7 +1,15 @@
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
+import { fetchMe } from "@/lib/userApi";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 export default async function RegisterPage() {
+  const locale = await getLocale();
+  const me = await fetchMe();
+  if (me && me.status !== "pending" && me.status !== "rejected") {
+    redirect({ href: "/dashboard", locale });
+  }
+
   const t = await getTranslations("Auth.register");
 
   return (
