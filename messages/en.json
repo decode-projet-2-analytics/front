@@ -34,11 +34,35 @@
   "Backoffice": {
     "nav": {
       "dashboard": "Dashboard",
+      "applications": "Applications",
       "adminUsers": "Webmasters"
     },
     "footer": {
       "copyright": "© {year} decode-analytics. All rights reserved."
     }
+  },
+  "Applications": {
+    "title": "Applications & credentials",
+    "subtitle": "Manage your applications, their APP_ID and APP_SECRET to secure your SDK integration.",
+    "noApplications": "No application yet. Create one below.",
+    "appId": "APP_ID",
+    "allowedUrls": "Allowed URLs (CORS)",
+    "secretActive": "Secret active",
+    "secretMissing": "No secret",
+    "generate": "Generate secret",
+    "regenerate": "Regenerate secret",
+    "revoke": "Revoke",
+    "revokeConfirm": "Confirm revocation?",
+    "revokeConfirmYes": "Yes, revoke",
+    "cancel": "Cancel",
+    "secretError": "Something went wrong.",
+    "secretRevealWarning": "Copy this key now: it will never be shown again.",
+    "createTitle": "Create an application",
+    "createNamePlaceholder": "Application name",
+    "createUrlPlaceholder": "https://my-site.com",
+    "createSubmit": "Create",
+    "createError": "Could not create the application.",
+    "copy": "Copy"
   },
   "Admin": {
     "users": {

@@ -34,11 +34,35 @@
   "Backoffice": {
     "nav": {
       "dashboard": "Dashboard",
+      "applications": "Applications",
       "adminUsers": "Webmasters"
     },
     "footer": {
       "copyright": "© {year} decode-analytics. Tous droits réservés."
     }
+  },
+  "Applications": {
+    "title": "Applications & credentials",
+    "subtitle": "Gérez vos applications, leur APP_ID et leur APP_SECRET pour sécuriser l'intégration des SDK.",
+    "noApplications": "Aucune application pour le moment. Créez-en une ci-dessous.",
+    "appId": "APP_ID",
+    "allowedUrls": "URLs autorisées (CORS)",
+    "secretActive": "Secret actif",
+    "secretMissing": "Aucun secret",
+    "generate": "Générer un secret",
+    "regenerate": "Régénérer le secret",
+    "revoke": "Révoquer",
+    "revokeConfirm": "Confirmer la révocation ?",
+    "revokeConfirmYes": "Oui, révoquer",
+    "cancel": "Annuler",
+    "secretError": "Une erreur est survenue.",
+    "secretRevealWarning": "Copiez cette clé maintenant : elle ne sera plus jamais affichée.",
+    "createTitle": "Créer une application",
+    "createNamePlaceholder": "Nom de l'application",
+    "createUrlPlaceholder": "https://mon-site.fr",
+    "createSubmit": "Créer",
+    "createError": "Impossible de créer l'application.",
+    "copy": "Copier"
   },
   "Admin": {
     "users": {
