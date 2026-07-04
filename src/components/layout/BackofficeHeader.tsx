@@ -22,6 +22,12 @@ export default function BackofficeHeader({ isAdmin = false }: Props) {
           >
             {t("nav.dashboard")}
           </Link>
+          <Link
+            href="/applications"
+            className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
+          >
+            {t("nav.applications")}
+          </Link>
           {isAdmin && (
             <Link
               href="/admin/users"
