@@ -1,8 +1,7 @@
 "use server";
 
 import { getTokenServer } from "./auth";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from "./env";
 
 export type UserStatus = "pending" | "validated" | "rejected";
 
@@ -22,7 +21,7 @@ export interface AdminUser {
 export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]> {
   const token = await getTokenServer();
 
-  const url = new URL(`${BASE_URL}/admin/users`);
+  const url = new URL(`${API_BASE_URL}/admin/users`);
   if (status) url.searchParams.set("status", status);
 
   const res = await fetch(url.toString(), {
@@ -42,7 +41,7 @@ export async function impersonateUser(
 ): Promise<{ token: string } | null> {
   const token = await getTokenServer();
 
-  const res = await fetch(`${BASE_URL}/admin/impersonate/${userId}`, {
+  const res = await fetch(`${API_BASE_URL}/admin/impersonate/${userId}`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -58,7 +57,7 @@ export async function updateUserStatus(
 ): Promise<{ ok: boolean }> {
   const token = await getTokenServer();
 
-  const res = await fetch(`${BASE_URL}/admin/users/${userId}/status`, {
+  const res = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${token}`,

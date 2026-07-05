@@ -1,11 +1,10 @@
 import { getToken } from "./auth";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from "./env";
 
 export async function apiFetch(path: string, init: RequestInit = {}) {
   const token = getToken();
 
-  return fetch(`${BASE_URL}${path}`, {
+  return fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",

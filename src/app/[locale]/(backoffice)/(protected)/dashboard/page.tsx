@@ -1,14 +1,20 @@
 import { getTranslations } from "next-intl/server";
 import { fetchMe } from "@/lib/userApi";
+import { fetchApplications } from "@/lib/applicationsApi";
+import { getDefaultApplicationId } from "@/lib/env";
+import DashboardView from "@/components/dashboard/DashboardView";
 
 export default async function DashboardPage() {
-  const t = await getTranslations("Dashboard");
-  const me = await fetchMe();
+  const [t, me, applications] = await Promise.all([
+    getTranslations("Dashboard"),
+    fetchMe(),
+    fetchApplications(),
+  ]);
 
   const displayName =
     [me?.firstname, me?.lastname].filter(Boolean).join(" ") ||
     me?.email ||
-    "—";
+    "-";
 
   const memberSince = me?.createdAt
     ? new Date(me.createdAt).toLocaleDateString("fr-FR", {
@@ -18,19 +24,24 @@ export default async function DashboardPage() {
       })
     : null;
 
+  const defaultApplicationId =
+    applications.find((app) => app.id === getDefaultApplicationId())?.id ??
+    applications[0]?.id ??
+    null;
+
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 max-w-5xl mx-auto w-full gap-6">
-      {/* En-tête */}
+    <div className="flex flex-1 flex-col px-6 py-8 max-w-6xl mx-auto w-full gap-6">
       <div>
         <h1 className="text-2xl font-semibold">
           {t("greeting", { name: displayName })}
         </h1>
         {me?.companyName && (
-          <p className="text-sm text-foreground-secondary mt-1">{me.companyName}</p>
+          <p className="text-sm text-foreground-secondary mt-1">
+            {me.companyName}
+          </p>
         )}
       </div>
 
-      {/* Carte profil */}
       <div className="rounded-lg border border-border bg-surface-1 p-6 space-y-4">
         <h2 className="text-sm font-medium text-foreground-secondary uppercase tracking-wide">
           {t("profileTitle")}
@@ -48,16 +59,18 @@ export default async function DashboardPage() {
           />
           <Field label={t("fieldMember")} value={memberSince} />
           <div className="flex flex-col gap-1">
-            <span className="text-xs text-foreground-muted">{t("fieldStatus")}</span>
+            <span className="text-xs text-foreground-muted">
+              {t("fieldStatus")}
+            </span>
             {me?.status && <StatusBadge status={me.status} t={t} />}
           </div>
         </div>
       </div>
 
-      {/* Placeholder widgets de Bastien à intégrer */}
-      <div className="rounded-lg border border-dashed border-border bg-surface-0 p-8 text-center text-sm text-foreground-muted">
-        {t("widgetsPlaceholder")}
-      </div>
+      <DashboardView
+        applications={applications}
+        defaultApplicationId={defaultApplicationId}
+      />
     </div>
   );
 }
@@ -81,10 +94,10 @@ function Field({
           rel="noopener noreferrer"
           className="text-sm text-primary hover:underline truncate"
         >
-          {value ?? "—"}
+          {value ?? "-"}
         </a>
       ) : (
-        <span className="text-sm truncate">{value ?? "—"}</span>
+        <span className="text-sm truncate">{value ?? "-"}</span>
       )}
     </div>
   );

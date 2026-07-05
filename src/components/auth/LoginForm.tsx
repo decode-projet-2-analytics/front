@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { setToken, removeToken } from "@/lib/auth";
 import { apiFetch } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/env";
 
 export default function LoginForm() {
   const t = useTranslations("Auth.login");
@@ -49,8 +50,7 @@ export default function LoginForm() {
         atob(data.token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
       );
       const sub = payload.sub;
-      const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-      const meRes = await fetch(`${BASE_URL}/users/${sub}`, {
+      const meRes = await fetch(`${API_BASE_URL}/users/${sub}`, {
         headers: { Authorization: `Bearer ${data.token}` },
       });
       if (meRes.ok) {

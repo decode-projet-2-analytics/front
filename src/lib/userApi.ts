@@ -1,8 +1,7 @@
 "use server";
 
 import { getTokenServer } from "./auth";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from "./env";
 
 export interface CurrentUser {
   id: number;
@@ -37,7 +36,7 @@ export async function fetchMe(): Promise<CurrentUser | null> {
   if (!sub) return null;
 
   try {
-    const res = await fetch(`${BASE_URL}/users/${sub}`, {
+    const res = await fetch(`${API_BASE_URL}/users/${sub}`, {
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
     });

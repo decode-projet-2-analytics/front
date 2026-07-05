@@ -18,8 +18,7 @@ export default async function ProtectedLayout({
   const me = await fetchMe();
   if (!me || me.status === "pending") {
     redirect({ href: "/pending", locale });
-  }
-  if (me.status === "rejected") {
+  } else if (me.status === "rejected") {
     redirect({ href: "/login", locale });
   }
 

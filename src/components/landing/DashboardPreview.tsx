@@ -3,11 +3,10 @@ const bars = [42, 68, 55, 82, 71, 94, 78, 88, 65, 91, 76, 85];
 export default function DashboardPreview() {
   return (
     <div className="relative mx-auto w-full max-w-4xl">
-      <div className="pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-b from-primary/20 via-primary/5 to-transparent" />
+      <div className="pointer-events-none absolute -inset-px rounded-2xl bg-linear-to-b from-primary/20 via-primary/5 to-transparent" />
       <div className="absolute -top-20 left-1/2 h-40 w-3/4 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl animate-pulse-glow" />
 
       <div className="relative overflow-hidden rounded-2xl border border-border bg-surface-1 shadow-[0_8px_40px_rgba(0,0,0,0.5)]">
-        {/* Window chrome */}
         <div className="flex items-center gap-2 border-b border-border-subtle px-4 py-3">
           <span className="h-2.5 w-2.5 rounded-full bg-error/60" />
           <span className="h-2.5 w-2.5 rounded-full bg-warning/60" />
@@ -25,7 +24,6 @@ export default function DashboardPreview() {
         </div>
 
         <div className="grid gap-3 p-4 sm:grid-cols-3">
-          {/* KPI cards */}
           {[
             { label: "Visiteurs", value: "12 847", delta: "+12.4%" },
             { label: "Taux conversion", value: "3.2%", delta: "+0.8%" },
@@ -50,7 +48,6 @@ export default function DashboardPreview() {
           ))}
         </div>
 
-        {/* Chart area */}
         <div className="mx-4 mb-4 rounded-lg border border-border-subtle bg-surface-0 p-4">
           <div className="mb-4 flex items-center justify-between">
             <p className="text-sm font-medium">Événements / heure</p>

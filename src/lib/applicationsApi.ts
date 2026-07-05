@@ -1,8 +1,7 @@
 "use server";
 
 import { getTokenServer } from "./auth";
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_BASE_URL } from "./env";
 
 export interface Application {
   id: number;
@@ -19,7 +18,7 @@ export async function fetchApplications(): Promise<Application[]> {
   const token = await getTokenServer();
   if (!token) return [];
 
-  const res = await fetch(`${BASE_URL}/applications`, {
+  const res = await fetch(`${API_BASE_URL}/applications`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -35,7 +34,7 @@ export async function createApplication(data: {
   const token = await getTokenServer();
   if (!token) return null;
 
-  const res = await fetch(`${BASE_URL}/applications`, {
+  const res = await fetch(`${API_BASE_URL}/applications`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -54,7 +53,7 @@ export async function generateApplicationSecret(
   const token = await getTokenServer();
   if (!token) return null;
 
-  const res = await fetch(`${BASE_URL}/applications/${applicationId}/secret`, {
+  const res = await fetch(`${API_BASE_URL}/applications/${applicationId}/secret`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -69,7 +68,7 @@ export async function revokeApplicationSecret(
   const token = await getTokenServer();
   if (!token) return { ok: false };
 
-  const res = await fetch(`${BASE_URL}/applications/${applicationId}/secret`, {
+  const res = await fetch(`${API_BASE_URL}/applications/${applicationId}/secret`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
