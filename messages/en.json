@@ -35,7 +35,8 @@
     "nav": {
       "dashboard": "Dashboard",
       "applications": "Applications",
-      "adminUsers": "Webmasters"
+      "adminUsers": "Webmasters",
+      "backToSite": "Back to home"
     },
     "footer": {
       "copyright": "© {year} decode-analytics. All rights reserved."
