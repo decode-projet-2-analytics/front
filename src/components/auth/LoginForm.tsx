@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { setToken, removeToken } from "@/lib/auth";
@@ -10,6 +10,7 @@ import { API_BASE_URL } from "@/lib/env";
 export default function LoginForm() {
   const t = useTranslations("Auth.login");
   const router = useRouter();
+  const [, startTransition] = useTransition();
   const [error, setError] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -56,7 +57,10 @@ export default function LoginForm() {
       if (meRes.ok) {
         const me = await meRes.json();
         if (me.status === "pending") {
-          router.replace("/pending");
+          startTransition(() => {
+            router.replace("/pending");
+            router.refresh();
+          });
           return;
         }
         if (me.status === "rejected") {
@@ -68,7 +72,10 @@ export default function LoginForm() {
     } catch {
     }
 
-    router.replace("/dashboard");
+    startTransition(() => {
+      router.replace("/dashboard");
+      router.refresh();
+    });
   }
 
   return (
