@@ -1,7 +1,7 @@
 "use server";
 
-import { getTokenServer } from "./auth";
-import { API_BASE_URL } from "./env";
+import { apiFetchServer } from "./api";
+import { getTokenServer, getTokenSub } from "./auth";
 
 export interface CurrentUser {
   id: number;
@@ -17,29 +17,15 @@ export interface CurrentUser {
   updatedAt: string;
 }
 
-function getSubFromToken(token: string): string | null {
-  try {
-    const payload = JSON.parse(
-      Buffer.from(token.split(".")[1], "base64url").toString("utf-8")
-    );
-    return payload.sub ?? null;
-  } catch {
-    return null;
-  }
-}
-
 export async function fetchMe(): Promise<CurrentUser | null> {
   const token = await getTokenServer();
   if (!token) return null;
 
-  const sub = getSubFromToken(token);
+  const sub = getTokenSub(token);
   if (!sub) return null;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/users/${sub}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    });
+    const res = await apiFetchServer(`/users/${sub}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

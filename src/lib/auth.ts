@@ -51,6 +51,14 @@ function decodeJwtPayload(token: string): Record<string, unknown> {
   );
 }
 
+export function getTokenSub(token: string): string | null {
+  try {
+    return (decodeJwtPayload(token).sub as string) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function getServerRole(): Promise<string | null> {
   const token = await getTokenServer();
   if (!token) return null;

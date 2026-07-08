@@ -1,7 +1,6 @@
 "use server";
 
-import { getTokenServer } from "./auth";
-import { API_BASE_URL } from "./env";
+import { apiFetchServer } from "./api";
 
 export type UserStatus = "pending" | "validated" | "rejected";
 
@@ -19,15 +18,10 @@ export interface AdminUser {
 }
 
 export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]> {
-  const token = await getTokenServer();
+  const path =
+    status !== undefined ? `/admin/users?status=${status}` : "/admin/users";
 
-  const url = new URL(`${API_BASE_URL}/admin/users`);
-  if (status) url.searchParams.set("status", status);
-
-  const res = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: "no-store",
-  });
+  const res = await apiFetchServer(path, { cache: "no-store" });
 
   if (!res.ok) {
     console.error(`fetchAdminUsers failed: ${res.status} ${res.statusText}`);
@@ -39,13 +33,9 @@ export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]>
 export async function impersonateUser(
   userId: number
 ): Promise<{ token: string } | null> {
-  const token = await getTokenServer();
-
-  const res = await fetch(`${API_BASE_URL}/admin/impersonate/${userId}`, {
+  const res = await apiFetchServer(`/admin/impersonate/${userId}`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${token}` },
   });
-
   if (!res.ok) return null;
   return res.json();
 }
@@ -55,16 +45,9 @@ export async function updateUserStatus(
   status: UserStatus,
   reason?: string
 ): Promise<{ ok: boolean }> {
-  const token = await getTokenServer();
-
-  const res = await fetch(`${API_BASE_URL}/admin/users/${userId}/status`, {
+  const res = await apiFetchServer(`/admin/users/${userId}/status`, {
     method: "PATCH",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
     body: JSON.stringify({ status, ...(reason ? { reason } : {}) }),
   });
-
   return { ok: res.ok };
 }
