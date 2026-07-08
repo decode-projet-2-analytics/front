@@ -19,7 +19,8 @@
       "password": "Mot de passe",
       "submit": "Se connecter",
       "error": "Email ou mot de passe incorrect.",
-      "errorRejected": "Votre compte a été refusé. Contactez le support."
+      "errorRejected": "Votre compte a été refusé. Contactez le support.",
+      "reconnectMessage": "Veuillez vous reconnecter."
     },
     "register": {
       "title": "Inscription",
@@ -35,7 +36,10 @@
     "nav": {
       "dashboard": "Dashboard",
       "applications": "Applications",
+      "admin": "Administration",
       "adminUsers": "Webmasters",
+      "adminSupports": "Support",
+      "support": "Aide",
       "backToSite": "Retour à l'accueil"
     },
     "footer": {
@@ -92,6 +96,135 @@
       "banner": "Vous agissez en tant que {email}",
       "stop": "Quitter",
       "error": "Impossible d'impersonifier cet utilisateur."
+    }
+  },
+  "Support": {
+    "title": "Aide",
+    "subtitle": "Ouvrez un ticket et suivez vos conversations avec le support.",
+    "supportAvailable": "Le support est en ligne — vous pouvez ouvrir un ticket.",
+    "supportUnavailable": "Le support est hors ligne — vos tickets seront traités dès qu'un agent se connectera.",
+    "connection": {
+      "hint": "Connexion authentifiée via JWT sur les namespaces /notifications et /chat.",
+      "status": "Statut",
+      "server": "Serveur",
+      "socketId": "Socket ID",
+      "userId": "User ID",
+      "role": "Rôle",
+      "connecting": "Connexion…",
+      "connected": "Connecté",
+      "disconnected": "Déconnecté",
+      "error": "Erreur"
+    },
+    "help": {
+      "createTitle": "Ouvrir un ticket",
+      "noApplications": "Créez d'abord une application pour ouvrir un ticket.",
+      "application": "Application",
+      "problemType": "Type de problème",
+      "message": "Description du problème",
+      "messagePlaceholder": "Décrivez votre problème en détail…",
+      "problemTypes": {
+        "DATA_SEEMS_INCORRECT": "Les données semblent incorrectes",
+        "CANNOT_FIND_INFORMATION": "Je ne trouve pas une information",
+        "ACCESS_ISSUE": "Problème d'accès",
+        "NEED_HELP_INTEGRATION": "Besoin d'aide pour l'intégration",
+        "OTHER": "Autre"
+      },
+      "createSubmit": "Ouvrir le ticket",
+      "creating": "Ouverture…",
+      "createError": "Impossible d'ouvrir le ticket.",
+      "noConversations": "Aucun ticket ouvert.",
+      "colId": "ID",
+      "colApp": "Application",
+      "colProblem": "Type",
+      "colStatus": "Statut",
+      "colUpdated": "Dernière activité",
+      "colActions": "Actions",
+      "open": "Ouvrir",
+      "statusOpen": "Ouvert",
+      "statusClosed": "Fermé"
+    },
+    "webmaster": {
+      "createTitle": "Démarrer une conversation",
+      "noApplications": "Créez d'abord une application pour ouvrir une conversation.",
+      "application": "Application",
+      "createSubmit": "Créer",
+      "creating": "Création…",
+      "createError": "Impossible de créer la conversation.",
+      "noConversations": "Aucune conversation pour le moment.",
+      "colId": "ID",
+      "colApp": "Application",
+      "colStatus": "Statut",
+      "colUpdated": "Dernière activité",
+      "colActions": "Actions",
+      "open": "Ouvrir"
+    },
+    "chat": {
+      "title": "Conversation",
+      "back": "Retour",
+      "unknownApp": "Application inconnue",
+      "available": "Disponible",
+      "unavailable": "Indisponible",
+      "empty": "Aucun message pour le moment.",
+      "you": "Vous",
+      "unknownUser": "Utilisateur",
+      "supportOnline": "Support en ligne",
+      "supportOffline": "Support hors ligne",
+      "userOnline": "Utilisateur en ligne",
+      "userOffline": "Utilisateur hors ligne",
+      "typing": "Quelqu'un écrit…",
+      "placeholder": "Écrire un message…",
+      "send": "Envoyer",
+      "statusOpen": "Ouvert",
+      "statusClosed": "Fermé",
+      "closedBanner": "Ce ticket est fermé. Vous ne pouvez plus envoyer de messages.",
+      "closedPlaceholder": "Ticket fermé",
+      "problemTypes": {
+        "DATA_SEEMS_INCORRECT": "Les données semblent incorrectes",
+        "CANNOT_FIND_INFORMATION": "Je ne trouve pas une information",
+        "ACCESS_ISSUE": "Problème d'accès",
+        "NEED_HELP_INTEGRATION": "Besoin d'aide pour l'intégration",
+        "OTHER": "Autre"
+      },
+      "adminPanel": {
+        "title": "Utilisateur",
+        "name": "Nom",
+        "email": "Email",
+        "company": "Société",
+        "phone": "Téléphone",
+        "website": "Site web",
+        "accountStatus": "Statut du compte",
+        "noUser": "Aucun utilisateur associé.",
+        "ticketStatus": "Ticket",
+        "statusOpen": "Ouvert",
+        "statusClosed": "Fermé",
+        "closeTicket": "Fermer le ticket",
+        "closing": "Fermeture…",
+        "closeConfirm": "Fermer ce ticket ? L'utilisateur ne pourra plus envoyer de messages.",
+        "closeError": "Impossible de fermer le ticket.",
+        "alreadyClosed": "Ce ticket est déjà fermé."
+      },
+      "connection": {
+        "connecting": "Connexion…",
+        "connected": "Connecté",
+        "disconnected": "Déconnecté",
+        "error": "Erreur"
+      }
+    },
+    "admin": {
+      "title": "Support — tous les tickets",
+      "subtitle": "Tous les tickets de support sur la plateforme.",
+      "filterOpen": "Ouverts",
+      "filterClosed": "Fermés",
+      "filterAll": "Tous",
+      "noConversations": "Aucun ticket trouvé.",
+      "colId": "ID",
+      "colUser": "Utilisateur",
+      "colApp": "Application",
+      "colProblem": "Type",
+      "colStatus": "Statut",
+      "colUpdated": "Dernière activité",
+      "colActions": "Actions",
+      "open": "Ouvrir"
     }
   },
   "Dashboard": {

@@ -1,7 +1,11 @@
 import BackofficeHeader from "@/components/layout/BackofficeHeader";
 import BackofficeFooter from "@/components/layout/BackofficeFooter";
 import ImpersonateBanner from "@/components/admin/ImpersonateBanner";
-import { getServerRole, getAdminTokenServer, getImpersonatedEmail } from "@/lib/auth";
+import {
+  getServerRole,
+  getAdminTokenServer,
+  getImpersonatedEmail,
+} from "@/lib/auth";
 
 export default async function BackofficeLayout({
   children,

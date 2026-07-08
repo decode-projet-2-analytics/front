@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import AdminNavDropdown from "./AdminNavDropdown";
 import Logo from "./Logo";
 
 interface Props {
@@ -28,14 +29,13 @@ export default function BackofficeHeader({ isAdmin = false }: Props) {
           >
             {t("nav.applications")}
           </Link>
-          {isAdmin && (
-            <Link
-              href="/admin/users"
-              className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
-            >
-              {t("nav.adminUsers")}
-            </Link>
-          )}
+          <Link
+            href="/help"
+            className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
+          >
+            {t("nav.support")}
+          </Link>
+          {isAdmin && <AdminNavDropdown />}
           <Link
             href="/"
             className="text-sm text-foreground-muted transition-colors hover:text-foreground"

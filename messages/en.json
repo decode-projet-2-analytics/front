@@ -19,7 +19,8 @@
       "password": "Password",
       "submit": "Sign in",
       "error": "Incorrect email or password.",
-      "errorRejected": "Your account has been rejected. Please contact support."
+      "errorRejected": "Your account has been rejected. Please contact support.",
+      "reconnectMessage": "Please sign in again."
     },
     "register": {
       "title": "Sign up",
@@ -35,7 +36,10 @@
     "nav": {
       "dashboard": "Dashboard",
       "applications": "Applications",
+      "admin": "Administration",
       "adminUsers": "Webmasters",
+      "adminSupports": "Support",
+      "support": "Help",
       "backToSite": "Back to home"
     },
     "footer": {
@@ -92,6 +96,128 @@
       "banner": "You are acting as {email}",
       "stop": "Exit",
       "error": "Could not impersonate this user."
+    }
+  },
+  "Support": {
+    "title": "Help",
+    "subtitle": "Open a ticket and follow your support conversations.",
+    "supportAvailable": "Support is online — you can open a ticket.",
+    "supportUnavailable": "Support is offline — your tickets will be handled when an agent connects.",
+    "connection": {
+      "hint": "Authenticated connection via JWT on the /notifications and /chat namespaces.",
+      "status": "Status",
+      "server": "Server",
+      "socketId": "Socket ID",
+      "userId": "User ID",
+      "role": "Role",
+      "connecting": "Connecting…",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "error": "Error"
+    },
+    "help": {
+      "createTitle": "Open a ticket",
+      "noApplications": "Create an application first to open a ticket.",
+      "application": "Application",
+      "problemType": "Problem type",
+      "message": "Problem description",
+      "messagePlaceholder": "Describe your issue in detail…",
+      "problemTypes": {
+        "DATA_SEEMS_INCORRECT": "Data seems incorrect",
+        "CANNOT_FIND_INFORMATION": "Cannot find information",
+        "ACCESS_ISSUE": "Access issue",
+        "NEED_HELP_INTEGRATION": "Need help with integration",
+        "OTHER": "Other"
+      },
+      "createSubmit": "Open ticket",
+      "creating": "Opening…",
+      "createError": "Could not open the ticket.",
+      "noConversations": "No open tickets.",
+      "colId": "ID",
+      "colApp": "Application",
+      "colProblem": "Type",
+      "colStatus": "Status",
+      "colUpdated": "Last activity",
+      "colActions": "Actions",
+      "open": "Open",
+      "statusOpen": "Open",
+      "statusClosed": "Closed"
+    },
+    "webmaster": {
+      "createTitle": "Start a conversation",
+      "noApplications": "Create an application first to open a conversation.",
+      "application": "Application",
+      "createSubmit": "Create",
+      "creating": "Creating…",
+      "createError": "Could not create the conversation.",
+      "noConversations": "No conversations yet.",
+      "colId": "ID",
+      "colApp": "Application",
+      "colStatus": "Status",
+      "colUpdated": "Last activity",
+      "colActions": "Actions",
+      "open": "Open"
+    },
+    "chat": {
+      "title": "Conversation",
+      "back": "Back",
+      "unknownApp": "Unknown application",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "empty": "No messages yet.",
+      "you": "You",
+      "unknownUser": "User",
+      "supportOnline": "Support online",
+      "supportOffline": "Support offline",
+      "userOnline": "User online",
+      "userOffline": "User offline",
+      "typing": "Someone is typing…",
+      "placeholder": "Write a message…",
+      "send": "Send",
+      "statusOpen": "Open",
+      "statusClosed": "Closed",
+      "closedBanner": "This ticket is closed. You can no longer send messages.",
+      "closedPlaceholder": "Ticket closed",
+      "adminPanel": {
+        "title": "User",
+        "name": "Name",
+        "email": "Email",
+        "company": "Company",
+        "phone": "Phone",
+        "website": "Website",
+        "accountStatus": "Account status",
+        "noUser": "No linked user.",
+        "ticketStatus": "Ticket",
+        "statusOpen": "Open",
+        "statusClosed": "Closed",
+        "closeTicket": "Close ticket",
+        "closing": "Closing…",
+        "closeConfirm": "Close this ticket? The user will no longer be able to send messages.",
+        "closeError": "Unable to close the ticket.",
+        "alreadyClosed": "This ticket is already closed."
+      },
+      "connection": {
+        "connecting": "Connecting…",
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "error": "Error"
+      }
+    },
+    "admin": {
+      "title": "Support — all tickets",
+      "subtitle": "All support tickets across the platform.",
+      "filterOpen": "Open",
+      "filterClosed": "Closed",
+      "filterAll": "All",
+      "noConversations": "No tickets found.",
+      "colId": "ID",
+      "colUser": "User",
+      "colApp": "Application",
+      "colProblem": "Type",
+      "colStatus": "Status",
+      "colUpdated": "Last activity",
+      "colActions": "Actions",
+      "open": "Open"
     }
   },
   "Dashboard": {
