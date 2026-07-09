@@ -57,9 +57,6 @@ export async function fetchConversations(params?: {
   applicationId?: number;
   all?: boolean;
 }): Promise<Conversation[]> {
-  const token = await getTokenServer();
-  if (!token) return [];
-
   const search = new URLSearchParams();
   if (params?.status) search.set("status", params.status);
   if (params?.applicationId) {
@@ -80,9 +77,6 @@ export async function createConversation(data: {
   problemType: ProblemType;
   message: string;
 }): Promise<Conversation | null> {
-  const token = await getTokenServer();
-  if (!token) return null;
-
   const res = await apiFetchServer("/conversations", {
     method: "POST",
     body: JSON.stringify(data),
@@ -94,9 +88,6 @@ export async function createConversation(data: {
 export async function fetchConversation(
   conversationId: string,
 ): Promise<Conversation | null> {
-  const token = await getTokenServer();
-  if (!token) return null;
-
   const res = await apiFetchServer(`/conversations/${conversationId}`, {
     cache: "no-store",
   });
@@ -105,9 +96,6 @@ export async function fetchConversation(
 }
 
 export async function fetchMessages(conversationId: string): Promise<Message[]> {
-  const token = await getTokenServer();
-  if (!token) return [];
-
   const res = await apiFetchServer(
     `/conversations/${conversationId}/messages`,
     { cache: "no-store" },
@@ -119,9 +107,6 @@ export async function fetchMessages(conversationId: string): Promise<Message[]> 
 export async function closeConversation(
   conversationId: string,
 ): Promise<Conversation | null> {
-  const token = await getTokenServer();
-  if (!token) return null;
-
   const res = await apiFetchServer(`/conversations/${conversationId}`, {
     method: "PATCH",
     body: JSON.stringify({ status: "closed" }),

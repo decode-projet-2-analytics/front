@@ -201,6 +201,36 @@
         "connected": "Connected",
         "disconnected": "Disconnected",
         "error": "Error"
+      },
+      "call": {
+        "startCall": "Start video call",
+        "accept": "Accept",
+        "reject": "Decline",
+        "cancel": "Cancel",
+        "hangUp": "Hang up",
+        "mute": "Mute",
+        "unmute": "Unmute",
+        "cameraOff": "Turn camera off",
+        "cameraOn": "Turn camera on",
+        "shareScreen": "Share screen",
+        "stopShare": "Stop sharing",
+        "localVideo": "You",
+        "remoteVideo": "Remote",
+        "unknownCaller": "User",
+        "incomingFrom": "Incoming call from {name}",
+        "state": {
+          "idle": "No call",
+          "outgoing": "Calling…",
+          "incoming": "Incoming call",
+          "connecting": "Connecting…",
+          "in-call": "In call",
+          "ended": "Call ended"
+        },
+        "errors": {
+          "mediaAccessDenied": "Camera/microphone access denied.",
+          "screenShareFailed": "Unable to share screen.",
+          "connectionFailed": "Audio/video connection failed."
+        }
       }
     },
     "admin": {

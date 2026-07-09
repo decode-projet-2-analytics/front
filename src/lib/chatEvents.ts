@@ -1,0 +1,26 @@
+export const CHAT_NAMESPACE = "/chat";
+
+export const CHAT_EVENTS = {
+  READY: "chat:ready",
+  ERROR: "chat:error",
+  CONVERSATION_JOIN: "conversation:join",
+  CONVERSATION_LEAVE: "conversation:leave",
+  CONVERSATION_STATUS: "conversation:status",
+  MESSAGE_SEND: "message:send",
+  MESSAGE_NEW: "message:new",
+  TYPING_START: "typing:start",
+  TYPING_STOP: "typing:stop",
+  CALL_INVITE: "call:invite",
+  CALL_INCOMING: "call:incoming",
+  CALL_ACCEPT: "call:accept",
+  CALL_ACCEPTED: "call:accepted",
+  CALL_REJECT: "call:reject",
+  CALL_REJECTED: "call:rejected",
+  CALL_CANCEL: "call:cancel",
+  CALL_CANCELLED: "call:cancelled",
+  CALL_OFFER: "call:offer",
+  CALL_ANSWER: "call:answer",
+  CALL_ICE_CANDIDATE: "call:ice-candidate",
+  CALL_END: "call:end",
+  CALL_ENDED: "call:ended",
+} as const;

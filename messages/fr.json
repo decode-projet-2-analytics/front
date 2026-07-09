@@ -208,6 +208,36 @@
         "connected": "Connecté",
         "disconnected": "Déconnecté",
         "error": "Erreur"
+      },
+      "call": {
+        "startCall": "Démarrer la visio",
+        "accept": "Accepter",
+        "reject": "Refuser",
+        "cancel": "Annuler",
+        "hangUp": "Raccrocher",
+        "mute": "Couper le micro",
+        "unmute": "Activer le micro",
+        "cameraOff": "Couper la caméra",
+        "cameraOn": "Activer la caméra",
+        "shareScreen": "Partager l'écran",
+        "stopShare": "Arrêter le partage",
+        "localVideo": "Vous",
+        "remoteVideo": "Interlocuteur",
+        "unknownCaller": "Utilisateur",
+        "incomingFrom": "Appel entrant de {name}",
+        "state": {
+          "idle": "Aucun appel",
+          "outgoing": "Appel en cours…",
+          "incoming": "Appel entrant",
+          "connecting": "Connexion…",
+          "in-call": "En appel",
+          "ended": "Appel terminé"
+        },
+        "errors": {
+          "mediaAccessDenied": "Accès caméra/micro refusé.",
+          "screenShareFailed": "Impossible de partager l'écran.",
+          "connectionFailed": "La connexion audio/vidéo a échoué."
+        }
       }
     },
     "admin": {
