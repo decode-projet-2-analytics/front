@@ -7,6 +7,7 @@ import { deleteWidget, type Widget } from "@/lib/dashboardApi";
 import KpiWidget from "./widgets/KpiWidget";
 import TimeseriesWidget from "./widgets/TimeseriesWidget";
 import HeatmapWidget from "./widgets/HeatmapWidget";
+import MouseHeatmapWidget from "./widgets/MouseHeatmapWidget";
 import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 
@@ -34,6 +35,8 @@ function WidgetContent({
       return <TimeseriesWidget widget={widget} refreshKey={refreshKey} />;
     case "heatmap":
       return <HeatmapWidget widget={widget} refreshKey={refreshKey} />;
+    case "mouse_heatmap":
+      return <MouseHeatmapWidget widget={widget} refreshKey={refreshKey} />;
   }
 }
 

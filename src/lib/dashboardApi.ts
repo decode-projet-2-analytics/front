@@ -3,7 +3,7 @@
 import { getTokenServer } from "./auth";
 import { API_BASE_URL } from "./env";
 
-export type WidgetType = "kpi" | "timeseries" | "heatmap";
+export type WidgetType = "kpi" | "timeseries" | "heatmap" | "mouse_heatmap";
 export type WidgetMetric = "count" | "rate";
 export type PeriodPreset = "1h" | "24h" | "7d" | "30d";
 export type TimeStep = "1h" | "1d" | "1w";
