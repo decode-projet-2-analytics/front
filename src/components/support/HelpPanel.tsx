@@ -2,12 +2,21 @@
 
 import { useRouter } from "@/i18n/navigation";
 import { useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Conversation, ProblemType } from "@/lib/chatApi";
 import { createConversation } from "@/lib/chatApi";
 import type { Application } from "@/lib/applicationsApi";
 import SupportAvailabilityBanner from "@/components/support/SupportAvailabilityBanner";
+
+const DATE_TIME_FORMAT: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+};
 
 const PROBLEM_TYPES: ProblemType[] = [
   "DATA_SEEMS_INCORRECT",
@@ -24,6 +33,7 @@ interface Props {
 
 export default function HelpPanel({ applications, conversations }: Props) {
   const t = useTranslations("Support.help");
+  const locale = useLocale();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [applicationId, setApplicationId] = useState(
@@ -176,7 +186,10 @@ export default function HelpPanel({ applications, conversations }: Props) {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-foreground-muted">
-                    {new Date(conversation.updatedAt).toLocaleString()}
+                    {new Date(conversation.updatedAt).toLocaleString(
+                      locale,
+                      DATE_TIME_FORMAT,
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <Link

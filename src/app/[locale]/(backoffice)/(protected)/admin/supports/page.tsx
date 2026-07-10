@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { fetchConversations, type ConversationStatus } from "@/lib/chatApi";
 
@@ -28,6 +28,7 @@ function formatUserName(
 
 export default async function AdminSupportsPage({ searchParams }: Props) {
   const t = await getTranslations("Support.admin");
+  const locale = await getLocale();
   const tHelp = await getTranslations("Support.help");
   const { status } = await searchParams;
 
@@ -122,7 +123,14 @@ export default async function AdminSupportsPage({ searchParams }: Props) {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-foreground-muted">
-                    {new Date(conversation.updatedAt).toLocaleString()}
+                    {new Date(conversation.updatedAt).toLocaleString(locale, {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    })}
                   </td>
                   <td className="px-4 py-3">
                     <Link
