@@ -3,7 +3,7 @@ import type { Widget } from "@/lib/dashboardApi";
 export const WIDGETS_PER_ROW = 3;
 
 export function isFullWidthWidget(widget: Widget): boolean {
-  return widget.type === "heatmap";
+  return widget.type === "heatmap" || widget.type === "mouse_heatmap";
 }
 
 export function sortWidgets(widgets: Widget[]): Widget[] {

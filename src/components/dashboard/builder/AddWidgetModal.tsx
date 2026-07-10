@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { createWidget, type WidgetType } from "@/lib/dashboardApi";
 
-const WIDGET_TYPES: WidgetType[] = ["kpi", "timeseries", "heatmap"];
+const WIDGET_TYPES: WidgetType[] = ["kpi", "timeseries", "heatmap", "mouse_heatmap"];
 
 interface Props {
   open: boolean;
