@@ -12,6 +12,7 @@ export interface AdminUser {
   companyName: string | null;
   contactPhone: string | null;
   websiteUrl: string | null;
+  kbisDocument: string | null;
   role: "Admin" | "Webmaster";
   status: UserStatus;
   createdAt: string;

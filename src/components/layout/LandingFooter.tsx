@@ -9,7 +9,7 @@ export default function LandingFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border-subtle py-12">
+    <footer className="shrink-0 border-t border-border-subtle py-12">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 sm:flex-row">
         <Logo href="/" size="sm" />
         <LocaleSwitcher />

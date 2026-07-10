@@ -10,9 +10,9 @@ export default async function LandingLayout({
   const me = await fetchMe();
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-dvh flex-1 flex-col">
       <LandingHeader user={me} />
-      <main className="flex-1 pt-14">{children}</main>
+      <main className="min-h-0 flex-1 pt-14">{children}</main>
       <LandingFooter />
     </div>
   );

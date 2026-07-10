@@ -15,8 +15,8 @@ export default async function PendingPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md space-y-6 text-center">
+    <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-10">
+      <div className="space-y-6 text-center">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-warning/10">
           <svg
             xmlns="http://www.w3.org/2000/svg"

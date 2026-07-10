@@ -44,8 +44,8 @@ export default async function LocaleLayout({ children, params }: Props) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning>
-        <div className="min-h-full flex flex-col font-sans">
+      <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
+        <div className="flex min-h-dvh flex-1 flex-col font-sans">
           <NextIntlClientProvider messages={messages}>
             {children}
           </NextIntlClientProvider>

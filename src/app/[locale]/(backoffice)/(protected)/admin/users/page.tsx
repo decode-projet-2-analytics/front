@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { fetchAdminUsers, type UserStatus } from "@/lib/adminApi";
 import UserStatusActions from "@/components/admin/UserStatusActions";
 import ImpersonateButton from "@/components/admin/ImpersonateButton";
+import { getAdminKbisUrl } from "@/lib/env";
 
 const STATUS_FILTERS: Array<{ key: UserStatus | "all"; label: string }> = [
   { key: "all", label: "filterAll" },
@@ -31,7 +32,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
   const users = await fetchAdminUsers(validStatus);
 
   return (
-    <div className="flex flex-1 flex-col px-6 py-8 max-w-5xl mx-auto w-full">
+    <div className="flex flex-1 flex-col px-6 py-8 max-w-6xl mx-auto w-full">
       <h1 className="text-2xl font-semibold mb-6">{t("title")}</h1>
 
       <div className="flex gap-2 mb-6">
@@ -63,14 +64,18 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                 <th className="px-4 py-3 font-medium">{t("colCompany")}</th>
                 <th className="px-4 py-3 font-medium">{t("colEmail")}</th>
                 <th className="px-4 py-3 font-medium">{t("colPhone")}</th>
-                <th className="px-4 py-3 font-medium">{t("colStatus")}</th>
+                <th className="px-4 py-3 font-medium text-center whitespace-nowrap">{t("colKbis")}</th>
+                <th className="px-4 py-3 font-medium text-center">{t("colStatus")}</th>
                 <th className="px-4 py-3 font-medium">{t("colRole")}</th>
                 <th className="px-4 py-3 font-medium">{t("colActions")}</th>
                 <th className="px-4 py-3 font-medium">{t("colImpersonate")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {users.map((user) => (
+              {users.map((user) => {
+                const kbisUrl = user.kbisDocument ? getAdminKbisUrl(user.id) : null;
+
+                return (
                 <tr key={user.id} className="hover:bg-surface-2/50">
                   <td className="px-4 py-3 font-medium">
                     {user.companyName ?? "—"}
@@ -87,9 +92,25 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                   </td>
                   <td className="px-4 py-3 text-muted">{user.email}</td>
                   <td className="px-4 py-3 text-muted">{user.contactPhone ?? "—"}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-center whitespace-nowrap">
+                    {kbisUrl ? (
+                      <a
+                        href={kbisUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t("kbisViewTitle")}
+                        className="inline-flex items-center gap-1 rounded-md border border-border px-2.5 py-1 text-xs font-medium text-primary hover:bg-surface-2"
+                      >
+                        {t("kbisView")}
+                        <span aria-hidden="true">↗</span>
+                      </a>
+                    ) : (
+                      <span className="text-muted">—</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-center">
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_BADGE[user.status]}`}
+                      className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap ${STATUS_BADGE[user.status]}`}
                     >
                       {t(`status_${user.status}`)}
                     </span>
@@ -104,7 +125,8 @@ export default async function AdminUsersPage({ searchParams }: Props) {
                     )}
                   </td>
                 </tr>
-              ))}
+              );
+              })}
             </tbody>
           </table>
         </div>

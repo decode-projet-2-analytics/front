@@ -17,10 +17,10 @@ export default async function BackofficeLayout({
   const impersonatedEmail = adminToken ? await getImpersonatedEmail() : null;
 
   return (
-    <div className="flex min-h-full flex-col">
+    <div className="flex min-h-dvh flex-1 flex-col">
       {impersonatedEmail && <ImpersonateBanner email={impersonatedEmail} />}
       <BackofficeHeader isAdmin={role === "Admin"} />
-      <main className="flex flex-1 flex-col">{children}</main>
+      <main className="flex min-h-0 flex-1 flex-col">{children}</main>
       <BackofficeFooter />
     </div>
   );
