@@ -1,6 +1,6 @@
 "use server";
 
-import { apiFetchServer } from "./api";
+import { apiFetch } from "./api";
 
 export interface Application {
   id: number;
@@ -14,7 +14,7 @@ export interface Application {
 }
 
 export async function fetchApplications(): Promise<Application[]> {
-  const res = await apiFetchServer("/applications", { cache: "no-store" });
+  const res = await apiFetch("/applications", { cache: "no-store" });
   if (!res.ok) return [];
   return res.json();
 }
@@ -22,7 +22,7 @@ export async function fetchApplications(): Promise<Application[]> {
 export async function fetchApplication(
   id: number,
 ): Promise<Application | null> {
-  const res = await apiFetchServer(`/applications/${id}`, {
+  const res = await apiFetch(`/applications/${id}`, {
     cache: "no-store",
   });
   if (!res.ok) return null;
@@ -33,7 +33,7 @@ export async function createApplication(data: {
   name: string;
   allowedUrls: string[];
 }): Promise<Application | null> {
-  const res = await apiFetchServer("/applications", {
+  const res = await apiFetch("/applications", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -45,7 +45,7 @@ export async function updateApplication(
   id: number,
   data: { name?: string; allowedUrls?: string[] },
 ): Promise<Application | null> {
-  const res = await apiFetchServer(`/applications/${id}`, {
+  const res = await apiFetch(`/applications/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -56,7 +56,7 @@ export async function updateApplication(
 export async function generateApplicationSecret(
   applicationId: number,
 ): Promise<{ appSecret: string } | null> {
-  const res = await apiFetchServer(`/applications/${applicationId}/secret`, {
+  const res = await apiFetch(`/applications/${applicationId}/secret`, {
     method: "POST",
   });
   if (!res.ok) return null;
@@ -66,7 +66,7 @@ export async function generateApplicationSecret(
 export async function revokeApplicationSecret(
   applicationId: number,
 ): Promise<{ ok: boolean }> {
-  const res = await apiFetchServer(`/applications/${applicationId}/secret`, {
+  const res = await apiFetch(`/applications/${applicationId}/secret`, {
     method: "DELETE",
   });
   return { ok: res.ok };

@@ -1,7 +1,6 @@
 "use server";
 
-import { getTokenServer } from "./auth";
-import { API_BASE_URL } from "./env";
+import { apiFetch } from "./api";
 
 export type WidgetType = "kpi" | "timeseries" | "heatmap" | "mouse_heatmap";
 export type WidgetMetric = "count" | "rate";
@@ -106,74 +105,46 @@ export type WidgetData =
   | TimeseriesWidgetData
   | HeatmapWidgetData;
 
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = await getTokenServer();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
-async function jsonHeaders(): Promise<HeadersInit> {
-  return {
-    ...(await getAuthHeaders()),
-    "Content-Type": "application/json",
-  };
-}
-
 export async function fetchWidgets(applicationId: number): Promise<Widget[]> {
-  const url = new URL(`${API_BASE_URL}/widgets`);
-  url.searchParams.set("applicationId", String(applicationId));
-
-  const res = await fetch(url.toString(), {
-    headers: await getAuthHeaders(),
-    cache: "no-store",
-  });
-
+  const res = await apiFetch(
+    `/widgets?applicationId=${encodeURIComponent(String(applicationId))}`,
+    { cache: "no-store" },
+  );
   if (!res.ok) return [];
   return res.json();
 }
 
 export async function createWidget(body: CreateWidgetBody): Promise<Widget | null> {
-  const res = await fetch(`${API_BASE_URL}/widgets`, {
+  const res = await apiFetch("/widgets", {
     method: "POST",
-    headers: await jsonHeaders(),
     body: JSON.stringify(body),
   });
-
   if (!res.ok) return null;
   return res.json();
 }
 
 export async function updateWidget(
   id: number,
-  body: UpdateWidgetBody
+  body: UpdateWidgetBody,
 ): Promise<Widget | null> {
-  const res = await fetch(`${API_BASE_URL}/widgets/${id}`, {
+  const res = await apiFetch(`/widgets/${id}`, {
     method: "PATCH",
-    headers: await jsonHeaders(),
     body: JSON.stringify(body),
   });
-
   if (!res.ok) return null;
   return res.json();
 }
 
 export async function deleteWidget(id: number): Promise<boolean> {
-  const res = await fetch(`${API_BASE_URL}/widgets/${id}`, {
-    method: "DELETE",
-    headers: await getAuthHeaders(),
-  });
-
+  const res = await apiFetch(`/widgets/${id}`, { method: "DELETE" });
   return res.ok;
 }
 
 export async function fetchTags(applicationId: number): Promise<Tag[]> {
-  const url = new URL(`${API_BASE_URL}/tags`);
-  url.searchParams.set("applicationId", String(applicationId));
-
-  const res = await fetch(url.toString(), {
-    headers: await getAuthHeaders(),
-    cache: "no-store",
-  });
-
+  const res = await apiFetch(
+    `/tags?applicationId=${encodeURIComponent(String(applicationId))}`,
+    { cache: "no-store" },
+  );
   if (!res.ok) return [];
   return res.json();
 }
@@ -214,11 +185,7 @@ export async function moveWidgetInList(
 }
 
 export async function fetchWidgetData(id: number): Promise<WidgetData | null> {
-  const res = await fetch(`${API_BASE_URL}/widgets/${id}/data`, {
-    headers: await getAuthHeaders(),
-    cache: "no-store",
-  });
-
+  const res = await apiFetch(`/widgets/${id}/data`, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }

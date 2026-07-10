@@ -1,5 +1,12 @@
 const TOKEN_COOKIE = "accessToken";
+const REFRESH_TOKEN_COOKIE = "refreshToken";
 const ADMIN_TOKEN_COOKIE = "adminToken";
+
+const AUTH_COOKIES = [
+  TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  ADMIN_TOKEN_COOKIE,
+] as const;
 
 function getCookie(name: string): string | null {
   if (typeof document === "undefined") return null;
@@ -7,20 +14,61 @@ function getCookie(name: string): string | null {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+function clearCookie(name: string) {
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+}
+
 export const getToken = () => getCookie(TOKEN_COOKIE);
+export const getRefreshToken = () => getCookie(REFRESH_TOKEN_COOKIE);
 
 export const getTokenServer = async () => {
   const { cookies } = await import("next/headers");
   return (await cookies()).get(TOKEN_COOKIE)?.value;
 };
 
+export const getRefreshTokenServer = async () => {
+  const { cookies } = await import("next/headers");
+  return (await cookies()).get(REFRESH_TOKEN_COOKIE)?.value;
+};
+
 export const setToken = (token: string) => {
   document.cookie = `${TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; SameSite=Lax`;
 };
 
-export const removeToken = () => {
-  document.cookie = `${TOKEN_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+export const setRefreshToken = (token: string) => {
+  document.cookie = `${REFRESH_TOKEN_COOKIE}=${encodeURIComponent(token)}; path=/; SameSite=Lax`;
 };
+
+/** Clear all auth cookies in the browser. */
+export function clearSession() {
+  for (const name of AUTH_COOKIES) clearCookie(name);
+}
+
+/** @deprecated Prefer `clearSession`. */
+export const removeToken = clearSession;
+
+/** Clear all auth cookies from a Server Action. Returns false in RSC render. */
+export async function clearSessionServer(): Promise<boolean> {
+  try {
+    const { cookies } = await import("next/headers");
+    const store = await cookies();
+    for (const name of AUTH_COOKIES) store.delete(name);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Persist a new access token from a Server Action. */
+export async function setAccessTokenServer(token: string): Promise<boolean> {
+  try {
+    const { cookies } = await import("next/headers");
+    (await cookies()).set(TOKEN_COOKIE, token, { path: "/", sameSite: "lax" });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 // --- Impersonate ---
 

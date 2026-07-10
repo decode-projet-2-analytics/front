@@ -1,11 +1,12 @@
-import { getToken, getTokenServer } from "./auth";
+import {
+  clearSessionServer,
+  getRefreshTokenServer,
+  getTokenServer,
+  setAccessTokenServer,
+} from "./auth";
 import { API_BASE_URL } from "./env";
 
-async function apiFetchWithToken(
-  token: string | null | undefined,
-  path: string,
-  init: RequestInit = {},
-): Promise<Response> {
+async function send(path: string, init: RequestInit, token?: string | null,): Promise<Response> {
   return fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
@@ -16,11 +17,50 @@ async function apiFetchWithToken(
   });
 }
 
-export async function apiFetch(path: string, init: RequestInit = {}) {
-  return apiFetchWithToken(getToken(), path, init);
+let refreshPromise: Promise<string | null> | null = null;
+
+async function refreshAccessToken(): Promise<string | null> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = (async () => {
+    const refreshToken = await getRefreshTokenServer();
+    if (!refreshToken) return null;
+
+    const res = await send("/auth/refresh", {
+      method: "POST",
+      body: JSON.stringify({ refreshToken }),
+    });
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as { accessToken?: string; token?: string };
+    const accessToken = data.accessToken ?? data.token;
+    if (!accessToken) return null;
+
+    await setAccessTokenServer(accessToken);
+    return accessToken;
+  })().finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
 }
 
-export async function apiFetchServer(path: string, init: RequestInit = {}) {
+async function forceLogin() {
+  if (!(await clearSessionServer())) return;
+
+  const { getLocale } = await import("next-intl/server");
+  const { redirect } = await import("@/i18n/navigation");
+  redirect({ href: "/login", locale: await getLocale() });
+}
+
+export async function apiFetch(path: string, init: RequestInit = {}) {
   const token = await getTokenServer();
-  return apiFetchWithToken(token, path, init);
+  const response = await send(path, init, token);
+  if (response.status !== 401 || path.startsWith("/auth/")) return response;
+
+  const nextToken = await refreshAccessToken();
+  if (nextToken) return send(path, init, nextToken);
+
+  await forceLogin();
+  return response;
 }

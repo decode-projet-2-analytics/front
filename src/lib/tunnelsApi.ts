@@ -1,6 +1,6 @@
 "use server";
 
-import { apiFetchServer } from "./api";
+import { apiFetch } from "./api";
 
 export interface Tunnel {
   id: number;
@@ -16,7 +16,7 @@ export async function fetchTunnels(applicationId: number): Promise<Tunnel[]> {
   const params = new URLSearchParams({
     applicationId: String(applicationId),
   });
-  const res = await apiFetchServer(`/tunnels?${params.toString()}`, {
+  const res = await apiFetch(`/tunnels?${params.toString()}`, {
     cache: "no-store",
   });
   if (!res.ok) return [];
@@ -28,7 +28,7 @@ export async function createTunnel(data: {
   applicationId: number;
   tagIds: number[];
 }): Promise<Tunnel | null> {
-  const res = await apiFetchServer("/tunnels", {
+  const res = await apiFetch("/tunnels", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -40,7 +40,7 @@ export async function updateTunnel(
   id: number,
   data: { name?: string; tagIds?: number[] },
 ): Promise<Tunnel | null> {
-  const res = await apiFetchServer(`/tunnels/${id}`, {
+  const res = await apiFetch(`/tunnels/${id}`, {
     method: "PATCH",
     body: JSON.stringify(data),
   });
@@ -49,6 +49,6 @@ export async function updateTunnel(
 }
 
 export async function archiveTunnel(id: number): Promise<{ ok: boolean }> {
-  const res = await apiFetchServer(`/tunnels/${id}`, { method: "DELETE" });
+  const res = await apiFetch(`/tunnels/${id}`, { method: "DELETE" });
   return { ok: res.ok };
 }

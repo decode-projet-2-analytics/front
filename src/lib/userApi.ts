@@ -1,6 +1,6 @@
 "use server";
 
-import { apiFetchServer } from "./api";
+import { apiFetch } from "./api";
 import { getTokenServer, getTokenSub } from "./auth";
 
 export interface CurrentUser {
@@ -25,7 +25,7 @@ export async function fetchMe(): Promise<CurrentUser | null> {
   if (!sub) return null;
 
   try {
-    const res = await apiFetchServer(`/users/${sub}`, { cache: "no-store" });
+    const res = await apiFetch(`/users/${sub}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

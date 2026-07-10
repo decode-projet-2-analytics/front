@@ -1,6 +1,6 @@
 "use server";
 
-import { apiFetchServer } from "./api";
+import { apiFetch } from "./api";
 import { getTokenServer } from "./auth";
 
 export type ConversationStatus = "open" | "closed";
@@ -67,7 +67,7 @@ export async function fetchConversations(params?: {
   const qs = search.toString();
   const path = qs ? `/conversations?${qs}` : "/conversations";
 
-  const res = await apiFetchServer(path, { cache: "no-store" });
+  const res = await apiFetch(path, { cache: "no-store" });
   if (!res.ok) return [];
   return res.json();
 }
@@ -77,7 +77,7 @@ export async function createConversation(data: {
   problemType: ProblemType;
   message: string;
 }): Promise<Conversation | null> {
-  const res = await apiFetchServer("/conversations", {
+  const res = await apiFetch("/conversations", {
     method: "POST",
     body: JSON.stringify(data),
   });
@@ -88,7 +88,7 @@ export async function createConversation(data: {
 export async function fetchConversation(
   conversationId: string,
 ): Promise<Conversation | null> {
-  const res = await apiFetchServer(`/conversations/${conversationId}`, {
+  const res = await apiFetch(`/conversations/${conversationId}`, {
     cache: "no-store",
   });
   if (!res.ok) return null;
@@ -96,7 +96,7 @@ export async function fetchConversation(
 }
 
 export async function fetchMessages(conversationId: string): Promise<Message[]> {
-  const res = await apiFetchServer(
+  const res = await apiFetch(
     `/conversations/${conversationId}/messages`,
     { cache: "no-store" },
   );
@@ -107,7 +107,7 @@ export async function fetchMessages(conversationId: string): Promise<Message[]> 
 export async function closeConversation(
   conversationId: string,
 ): Promise<Conversation | null> {
-  const res = await apiFetchServer(`/conversations/${conversationId}`, {
+  const res = await apiFetch(`/conversations/${conversationId}`, {
     method: "PATCH",
     body: JSON.stringify({ status: "closed" }),
   });

@@ -1,6 +1,6 @@
 "use server";
 
-import { apiFetchServer } from "./api";
+import { apiFetch } from "./api";
 
 export type UserStatus = "pending" | "validated" | "rejected";
 
@@ -21,7 +21,7 @@ export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]>
   const path =
     status !== undefined ? `/admin/users?status=${status}` : "/admin/users";
 
-  const res = await apiFetchServer(path, { cache: "no-store" });
+  const res = await apiFetch(path, { cache: "no-store" });
 
   if (!res.ok) {
     console.error(`fetchAdminUsers failed: ${res.status} ${res.statusText}`);
@@ -33,7 +33,7 @@ export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]>
 export async function impersonateUser(
   userId: number
 ): Promise<{ token: string } | null> {
-  const res = await apiFetchServer(`/admin/impersonate/${userId}`, {
+  const res = await apiFetch(`/admin/impersonate/${userId}`, {
     method: "POST",
   });
   if (!res.ok) return null;
@@ -45,7 +45,7 @@ export async function updateUserStatus(
   status: UserStatus,
   reason?: string
 ): Promise<{ ok: boolean }> {
-  const res = await apiFetchServer(`/admin/users/${userId}/status`, {
+  const res = await apiFetch(`/admin/users/${userId}/status`, {
     method: "PATCH",
     body: JSON.stringify({ status, ...(reason ? { reason } : {}) }),
   });
