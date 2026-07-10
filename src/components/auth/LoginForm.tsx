@@ -3,8 +3,7 @@
 import { FormEvent, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { setToken, removeToken } from "@/lib/auth";
-import { apiFetch } from "@/lib/api";
+import { setToken, setRefreshToken, clearSession } from "@/lib/auth";
 import { API_BASE_URL } from "@/lib/env";
 
 export default function LoginForm() {
@@ -19,8 +18,9 @@ export default function LoginForm() {
 
     const formData = new FormData(event.currentTarget);
 
-    const response = await apiFetch(`/auth/login`, {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: formData.get("email"),
         password: formData.get("password"),
@@ -43,16 +43,27 @@ export default function LoginForm() {
       return;
     }
 
-    const data: { token: string } = await response.json();
-    setToken(data.token);
+    const data: {
+      token?: string;
+      accessToken?: string;
+      refreshToken?: string;
+    } = await response.json();
+    const accessToken = data.accessToken ?? data.token;
+    if (!accessToken) {
+      setError(t("error"));
+      return;
+    }
+
+    setToken(accessToken);
+    if (data.refreshToken) setRefreshToken(data.refreshToken);
 
     try {
       const payload = JSON.parse(
-        atob(data.token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
+        atob(accessToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
       );
       const sub = payload.sub;
       const meRes = await fetch(`${API_BASE_URL}/users/${sub}`, {
-        headers: { Authorization: `Bearer ${data.token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (meRes.ok) {
         const me = await meRes.json();
@@ -65,12 +76,11 @@ export default function LoginForm() {
         }
         if (me.status === "rejected") {
           setError(t("errorRejected"));
-          removeToken();
+          clearSession();
           return;
         }
       }
-    } catch {
-    }
+    } catch {}
 
     startTransition(() => {
       router.replace("/dashboard");

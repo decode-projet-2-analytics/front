@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import Logo from "./Logo";
-import { removeToken } from "@/lib/auth";
+import { clearSession } from "@/lib/auth";
 import type { CurrentUser } from "@/lib/userApi";
 
 interface Props {
@@ -15,7 +15,7 @@ export default function LandingHeader({ user }: Props) {
   const router = useRouter();
 
   function handleLogout() {
-    removeToken();
+    clearSession();
     router.replace("/");
     router.refresh();
   }

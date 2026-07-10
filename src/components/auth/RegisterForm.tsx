@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { apiFetch } from "@/lib/api";
+import { API_BASE_URL } from "@/lib/env";
 
 export default function RegisterForm() {
   const t = useTranslations("Auth.register");
@@ -16,8 +16,9 @@ export default function RegisterForm() {
 
     const formData = new FormData(event.currentTarget);
 
-    const response = await apiFetch(`/users`, {
+    const response = await fetch(`${API_BASE_URL}/users`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         firstname: formData.get("firstname"),
         lastname: formData.get("lastname"),
