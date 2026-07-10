@@ -46,9 +46,9 @@ export interface UpdateWidgetBody {
 
 export interface Tag {
   id: number;
+  slug: string;
   comment: string;
   applicationId: number;
-  tunnelId: string;
   createdAt: string;
   updatedAt: string;
 }
