@@ -175,7 +175,7 @@ export default function WidgetConfigForm({
           <option value="">{t("filterTagAll")}</option>
           {tags.map((tag) => (
             <option key={tag.id} value={tag.id}>
-              {tag.comment || `#${tag.id}`}
+              {tag.comment ? `${tag.slug} — ${tag.comment}` : tag.slug}
             </option>
           ))}
         </select>
