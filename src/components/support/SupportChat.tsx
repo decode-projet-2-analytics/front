@@ -4,22 +4,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { Conversation, ConversationStatus, Message } from "@/lib/chatApi";
+import { CHAT_EVENTS, CHAT_NAMESPACE } from "@/lib/chatEvents";
 import { useSocket } from "@/hooks/useSocket";
 import { usePeerAvailability } from "@/hooks/usePeerAvailability";
+import { useSupportCall } from "@/hooks/useSupportCall";
 import SupportConversationAdminPanel from "@/components/support/SupportConversationAdminPanel";
-
-const CHAT_NAMESPACE = "/chat";
-
-const EVENTS = {
-  READY: "chat:ready",
-  CONVERSATION_JOIN: "conversation:join",
-  CONVERSATION_LEAVE: "conversation:leave",
-  CONVERSATION_STATUS: "conversation:status",
-  MESSAGE_SEND: "message:send",
-  MESSAGE_NEW: "message:new",
-  TYPING_START: "typing:start",
-  TYPING_STOP: "typing:stop",
-} as const;
+import SupportCallPanel from "@/components/support/SupportCallPanel";
 
 interface Props {
   conversation: Conversation;
@@ -45,10 +35,18 @@ export default function SupportChat({
   const { socket, connectionState } = useSocket(CHAT_NAMESPACE);
   const backHref = "/help";
   const isClosed = status === "closed";
+  const connectionReady = connectionState === "connected";
 
   const peerAvailable = usePeerAvailability(
     currentUserRole === "Admin" ? conversation.userId : null,
   );
+
+  const supportCall = useSupportCall({
+    socket,
+    conversationId: conversation.conversationId,
+    enabled: connectionReady && !isClosed,
+    peerAvailable,
+  });
 
   useEffect(() => {
     setMessages(initialMessages);
@@ -62,7 +60,7 @@ export default function SupportChat({
     const { conversationId } = conversation;
 
     function joinConversation() {
-      activeSocket.emit(EVENTS.CONVERSATION_JOIN, { conversationId });
+      activeSocket.emit(CHAT_EVENTS.CONVERSATION_JOIN, { conversationId });
     }
 
     function onMessageNew(message: Message) {
@@ -111,19 +109,19 @@ export default function SupportChat({
     }
 
     joinConversation();
-    activeSocket.on(EVENTS.READY, joinConversation);
-    activeSocket.on(EVENTS.MESSAGE_NEW, onMessageNew);
-    activeSocket.on(EVENTS.TYPING_START, onTypingStart);
-    activeSocket.on(EVENTS.TYPING_STOP, onTypingStop);
-    activeSocket.on(EVENTS.CONVERSATION_STATUS, onConversationStatus);
+    activeSocket.on(CHAT_EVENTS.READY, joinConversation);
+    activeSocket.on(CHAT_EVENTS.MESSAGE_NEW, onMessageNew);
+    activeSocket.on(CHAT_EVENTS.TYPING_START, onTypingStart);
+    activeSocket.on(CHAT_EVENTS.TYPING_STOP, onTypingStop);
+    activeSocket.on(CHAT_EVENTS.CONVERSATION_STATUS, onConversationStatus);
 
     return () => {
-      activeSocket.emit(EVENTS.CONVERSATION_LEAVE, { conversationId });
-      activeSocket.off(EVENTS.READY, joinConversation);
-      activeSocket.off(EVENTS.MESSAGE_NEW, onMessageNew);
-      activeSocket.off(EVENTS.TYPING_START, onTypingStart);
-      activeSocket.off(EVENTS.TYPING_STOP, onTypingStop);
-      activeSocket.off(EVENTS.CONVERSATION_STATUS, onConversationStatus);
+      activeSocket.emit(CHAT_EVENTS.CONVERSATION_LEAVE, { conversationId });
+      activeSocket.off(CHAT_EVENTS.READY, joinConversation);
+      activeSocket.off(CHAT_EVENTS.MESSAGE_NEW, onMessageNew);
+      activeSocket.off(CHAT_EVENTS.TYPING_START, onTypingStart);
+      activeSocket.off(CHAT_EVENTS.TYPING_STOP, onTypingStop);
+      activeSocket.off(CHAT_EVENTS.CONVERSATION_STATUS, onConversationStatus);
     };
   }, [socket, conversation.conversationId, currentUserId]);
 
@@ -134,7 +132,7 @@ export default function SupportChat({
   const sendMessage = useCallback(
     (content: string) => {
       if (!socket?.connected || !content.trim() || isClosed) return;
-      socket.emit(EVENTS.MESSAGE_SEND, {
+      socket.emit(CHAT_EVENTS.MESSAGE_SEND, {
         conversationId: conversation.conversationId,
         content: content.trim(),
       });
@@ -145,13 +143,13 @@ export default function SupportChat({
   const notifyTyping = useCallback(() => {
     if (!socket?.connected || isClosed) return;
 
-    socket.emit(EVENTS.TYPING_START, {
+    socket.emit(CHAT_EVENTS.TYPING_START, {
       conversationId: conversation.conversationId,
     });
 
     if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
     typingTimeoutRef.current = setTimeout(() => {
-      socket.emit(EVENTS.TYPING_STOP, {
+      socket.emit(CHAT_EVENTS.TYPING_STOP, {
         conversationId: conversation.conversationId,
       });
     }, 2000);
@@ -223,6 +221,23 @@ export default function SupportChat({
           </span>
         </div>
       </header>
+
+      <SupportCallPanel
+        callState={supportCall.callState}
+        localStream={supportCall.localStream}
+        remoteStream={supportCall.remoteStream}
+        callError={supportCall.callError}
+        incomingCallerName={supportCall.incomingCall?.callerFirstname ?? null}
+        canStartCall={supportCall.canStartCall}
+        peerAvailable={peerAvailable}
+        isClosed={isClosed}
+        connectionReady={connectionReady}
+        onStartCall={supportCall.startCall}
+        onAcceptCall={supportCall.acceptCall}
+        onRejectCall={supportCall.rejectCall}
+        onCancelCall={supportCall.cancelCall}
+        onEndCall={supportCall.endCall}
+      />
 
       {isClosed && (
         <div className="border-b border-border bg-foreground-muted/5 px-4 py-2 text-center text-sm text-foreground-muted">
@@ -301,10 +316,10 @@ export default function SupportChat({
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+      {chatPanel}
       <SupportConversationAdminPanel
         conversation={{ ...conversation, status }}
       />
-      {chatPanel}
     </div>
   );
 }
