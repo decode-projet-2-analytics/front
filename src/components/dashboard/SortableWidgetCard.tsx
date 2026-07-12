@@ -9,6 +9,7 @@ import WidgetCard from "./WidgetCard";
 interface Props {
   widget: Widget;
   refreshKey: number;
+  canManageWidget: boolean;
   reordering?: boolean;
   onDeleted: () => void;
   onUpdated: () => void;
@@ -17,6 +18,7 @@ interface Props {
 export default function SortableWidgetCard({
   widget,
   refreshKey,
+  canManageWidget,
   reordering = false,
   onDeleted,
   onUpdated,
@@ -40,14 +42,15 @@ export default function SortableWidgetCard({
 
   return (
     <div ref={setNodeRef} style={style} className={isDragging ? "relative z-10" : undefined}>
-      {isDragging ? (
+      {isDragging && canManageWidget ? (
         <WidgetCancelDropZone widgetId={widget.id} />
       ) : (
         <WidgetCard
           widget={widget}
           refreshKey={refreshKey}
           reordering={reordering}
-          dragHandleProps={{ ...attributes, ...listeners }}
+          canManageWidget={canManageWidget}
+          dragHandleProps={canManageWidget ? { ...attributes, ...listeners } : undefined}
           onDeleted={onDeleted}
           onUpdated={onUpdated}
         />

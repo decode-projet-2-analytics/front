@@ -46,6 +46,7 @@ import {
 
 interface Props {
   applicationId: number | null;
+  canManageWidgets: boolean;
   refreshToken?: number;
   pollTick?: number;
   onRefresh?: () => void;
@@ -57,6 +58,7 @@ function isSameOrder(a: Widget[], b: Widget[]): boolean {
 
 export default function WidgetGrid({
   applicationId,
+  canManageWidgets,
   refreshToken = 0,
   pollTick = 0,
   onRefresh,
@@ -295,9 +297,9 @@ export default function WidgetGrid({
     <DndContext
       sensors={sensors}
       collisionDetection={collisionDetection}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
+      onDragStart={canManageWidgets ? handleDragStart : undefined}
+      onDragEnd={canManageWidgets ? handleDragEnd : undefined}
+      onDragCancel={canManageWidgets ? handleDragCancel : undefined}
     >
       <div className="flex flex-col gap-4">
         <RowDropZone id={rowGapId(0)} enabled={isGapEnabled(0)} />
@@ -313,6 +315,7 @@ export default function WidgetGrid({
                   <DraggableWidgetCard
                     widget={row[0]}
                     refreshKey={pollTick}
+                    canManageWidget={canManageWidgets}
                     onDeleted={() => onRefresh?.()}
                     onUpdated={() => onRefresh?.()}
                   />
@@ -328,6 +331,7 @@ export default function WidgetGrid({
                         key={widget.id}
                         widget={widget}
                         refreshKey={pollTick}
+                        canManageWidget={canManageWidgets}
                         onDeleted={() => onRefresh?.()}
                         onUpdated={() => onRefresh?.()}
                       />

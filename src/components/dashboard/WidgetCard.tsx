@@ -14,6 +14,7 @@ import WidgetConfigModal from "./builder/WidgetConfigModal";
 interface Props {
   widget: Widget;
   refreshKey?: number;
+  canManageWidget: boolean;
   reordering?: boolean;
   isDragging?: boolean;
   dragHandleProps?: DraggableAttributes & Record<string, unknown>;
@@ -43,6 +44,7 @@ function WidgetContent({
 export default function WidgetCard({
   widget,
   refreshKey = 0,
+  canManageWidget,
   reordering = false,
   isDragging = false,
   dragHandleProps,
@@ -129,6 +131,7 @@ export default function WidgetCard({
             </div>
           </div>
 
+          {canManageWidget && (
           <div className="flex shrink-0 items-center gap-1">
             <div className="relative" ref={menuRef}>
               <button
@@ -200,24 +203,29 @@ export default function WidgetCard({
               )}
             </div>
           </div>
+          )}
         </header>
 
         <WidgetContent widget={widget} refreshKey={refreshKey} />
       </article>
 
-      <EditWidgetTitleModal
-        open={editTitleOpen}
-        widget={widget}
-        onClose={() => setEditTitleOpen(false)}
-        onUpdated={onUpdated}
-      />
+      {canManageWidget && (
+        <>
+          <EditWidgetTitleModal
+            open={editTitleOpen}
+            widget={widget}
+            onClose={() => setEditTitleOpen(false)}
+            onUpdated={onUpdated}
+          />
 
-      <WidgetConfigModal
-        open={configOpen}
-        widget={widget}
-        onClose={() => setConfigOpen(false)}
-        onUpdated={onUpdated}
-      />
+          <WidgetConfigModal
+            open={configOpen}
+            widget={widget}
+            onClose={() => setConfigOpen(false)}
+            onUpdated={onUpdated}
+          />
+        </>
+      )}
     </>
   );
 }

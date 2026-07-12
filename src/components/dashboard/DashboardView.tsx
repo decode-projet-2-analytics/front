@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { Application } from "@/lib/applicationsApi";
+import type { Application, ApplicationTeamRole } from "@/lib/applicationsApi";
 import ApplicationSelector from "./ApplicationSelector";
 import WidgetGrid from "./WidgetGrid";
 import AddWidgetModal from "./builder/AddWidgetModal";
@@ -11,11 +11,13 @@ import { useWidgetPolling } from "./hooks/useWidgetPolling";
 interface Props {
   applications: Application[];
   defaultApplicationId: number | null;
+  roleByApplication: Record<number, ApplicationTeamRole | null>;
 }
 
 export default function DashboardView({
   applications,
   defaultApplicationId,
+  roleByApplication,
 }: Props) {
   const t = useTranslations("Dashboard");
   const [applicationId, setApplicationId] = useState<number | null>(
@@ -26,7 +28,9 @@ export default function DashboardView({
   const [lastDataRefresh, setLastDataRefresh] = useState<string | null>(null);
   const pollTick = useWidgetPolling(10_000);
 
-  const canAddWidget = applicationId !== null;
+  const applicationRole = applicationId ? roleByApplication[applicationId] : null;
+  const canManageWidgets = applicationRole === "owner" || applicationRole === "admin";
+  const canAddWidget = applicationId !== null && canManageWidgets;
   const showLive = applicationId !== null;
 
   useEffect(() => {
@@ -101,6 +105,7 @@ export default function DashboardView({
 
       <WidgetGrid
         applicationId={applicationId}
+        canManageWidgets={canManageWidgets}
         refreshToken={gridRefresh}
         pollTick={pollTick}
         onRefresh={() => setGridRefresh((n) => n + 1)}

@@ -1,6 +1,10 @@
 import { getTranslations } from "next-intl/server";
 import { fetchMe } from "@/lib/userApi";
-import { fetchApplications } from "@/lib/applicationsApi";
+import {
+  fetchApplicationRole,
+  fetchApplications,
+  type ApplicationTeamRole,
+} from "@/lib/applicationsApi";
 import { getDefaultApplicationId } from "@/lib/env";
 import DashboardView from "@/components/dashboard/DashboardView";
 
@@ -28,6 +32,18 @@ export default async function DashboardPage() {
     applications.find((app) => app.id === getDefaultApplicationId())?.id ??
     applications[0]?.id ??
     null;
+  const applicationRoles = await Promise.all(
+    applications.map(async (application) => ({
+      id: application.id,
+      role: await fetchApplicationRole(application.id),
+    })),
+  );
+  const roleByApplication = Object.fromEntries(
+    applicationRoles.map(({ id, role }) => [id, role]),
+  ) as Record<number, ApplicationTeamRole | null>;
+  const applicationRole = defaultApplicationId
+    ? roleByApplication[defaultApplicationId]
+    : null;
 
   return (
     <div className="flex flex-1 flex-col px-6 py-8 max-w-6xl mx-auto w-full gap-6">
@@ -49,7 +65,10 @@ export default async function DashboardPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label={t("fieldEmail")} value={me?.email} />
-          <Field label={t("fieldRole")} value={me?.role} />
+          <Field
+            label={t("fieldRole")}
+            value={applicationRole ? t(`role_${applicationRole}`) : me?.role}
+          />
           <Field label={t("fieldCompany")} value={me?.companyName} />
           <Field label={t("fieldPhone")} value={me?.contactPhone} />
           <Field
@@ -70,6 +89,7 @@ export default async function DashboardPage() {
       <DashboardView
         applications={applications}
         defaultApplicationId={defaultApplicationId}
+        roleByApplication={roleByApplication}
       />
     </div>
   );

@@ -9,6 +9,7 @@ import { isFullWidthWidget } from "./widgetGridLayout";
 interface Props {
   widget: Widget;
   refreshKey: number;
+  canManageWidget: boolean;
   reordering?: boolean;
   onDeleted: () => void;
   onUpdated: () => void;
@@ -17,6 +18,7 @@ interface Props {
 export default function DraggableWidgetCard({
   widget,
   refreshKey,
+  canManageWidget,
   reordering = false,
   onDeleted,
   onUpdated,
@@ -28,7 +30,7 @@ export default function DraggableWidgetCard({
 
   return (
     <div ref={setNodeRef}>
-      {isDragging ? (
+      {isDragging && canManageWidget ? (
         <WidgetCancelDropZone
           widgetId={widget.id}
           fullWidth={isFullWidthWidget(widget)}
@@ -38,7 +40,8 @@ export default function DraggableWidgetCard({
           widget={widget}
           refreshKey={refreshKey}
           reordering={reordering}
-          dragHandleProps={{ ...attributes, ...listeners }}
+          canManageWidget={canManageWidget}
+          dragHandleProps={canManageWidget ? { ...attributes, ...listeners } : undefined}
           onDeleted={onDeleted}
           onUpdated={onUpdated}
         />
