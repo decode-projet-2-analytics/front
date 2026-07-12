@@ -2,7 +2,13 @@
 
 import { apiFetch } from "./api";
 
-export type WidgetType = "kpi" | "timeseries" | "heatmap" | "mouse_heatmap";
+export type WidgetType =
+  | "kpi"
+  | "timeseries"
+  | "heatmap"
+  | "mouse_heatmap"
+  | "breakdown"
+  | "scroll_depth";
 export type WidgetMetric = "count" | "rate";
 export type PeriodPreset = "1h" | "24h" | "7d" | "30d";
 export type TimeStep = "1h" | "1d" | "1w";
@@ -100,10 +106,35 @@ export interface HeatmapWidgetData {
   total: number;
 }
 
+export interface BreakdownRow {
+  key: string;
+  value: number;
+}
+
+export interface BreakdownWidgetData {
+  metric: WidgetMetric;
+  groupBy: string;
+  rows: BreakdownRow[];
+  total: number;
+}
+
+export interface ScrollDepthBucket {
+  range: string;
+  sessions: number;
+}
+
+export interface ScrollDepthWidgetData {
+  average: number;
+  buckets: ScrollDepthBucket[];
+  sessionsTracked: number;
+}
+
 export type WidgetData =
   | KpiWidgetData
   | TimeseriesWidgetData
-  | HeatmapWidgetData;
+  | HeatmapWidgetData
+  | BreakdownWidgetData
+  | ScrollDepthWidgetData;
 
 export async function fetchWidgets(applicationId: number): Promise<Widget[]> {
   const res = await apiFetch(

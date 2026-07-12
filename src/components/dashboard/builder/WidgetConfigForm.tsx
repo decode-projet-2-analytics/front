@@ -10,12 +10,15 @@ import {
   type WidgetMetric,
 } from "@/lib/dashboardApi";
 import {
+  BREAKDOWN_DIMENSIONS,
   PERIOD_PRESETS,
   TIME_STEPS,
   buildWidgetConfig,
   inferPeriod,
   readEventType,
+  readGroupBy,
   readTagId,
+  type BreakdownDimension,
   type PeriodPreset,
   type TimeStep,
 } from "./widgetConfigUtils";
@@ -50,8 +53,13 @@ export default function WidgetConfigForm({
   const [tagId, setTagId] = useState<number | "">(
     readTagId(widget.config.filters) ?? ""
   );
+  const [groupBy, setGroupBy] = useState<BreakdownDimension>(() =>
+    readGroupBy(widget.config.filters)
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const isBreakdown = widget.type === "breakdown";
 
   useEffect(() => {
     setPeriod(inferPeriod(widget.config.timeRange));
@@ -59,6 +67,7 @@ export default function WidgetConfigForm({
     setMetric(widget.config.metric);
     setEventType(readEventType(widget.config.filters));
     setTagId(readTagId(widget.config.filters) ?? "");
+    setGroupBy(readGroupBy(widget.config.filters));
   }, [widget]);
 
   function handleSubmit(e: React.FormEvent) {
@@ -71,7 +80,8 @@ export default function WidgetConfigForm({
       step,
       metric,
       eventType,
-      tagId === "" ? null : tagId
+      tagId === "" ? null : tagId,
+      isBreakdown ? groupBy : null
     );
 
     startTransition(async () => {
@@ -147,6 +157,25 @@ export default function WidgetConfigForm({
           ))}
         </div>
       </fieldset>
+
+      {isBreakdown && (
+        <label className="flex flex-col gap-1.5">
+          <span className="text-sm font-medium text-foreground-muted">
+            {t("breakdownGroupByLabel")}
+          </span>
+          <select
+            value={groupBy}
+            onChange={(e) => setGroupBy(e.target.value as BreakdownDimension)}
+            className={fieldClass}
+          >
+            {BREAKDOWN_DIMENSIONS.map((dimension) => (
+              <option key={dimension} value={dimension}>
+                {t(`groupBy_${dimension}`)}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       <label className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-foreground-muted">

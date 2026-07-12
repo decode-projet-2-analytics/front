@@ -8,6 +8,8 @@ import KpiWidget from "./widgets/KpiWidget";
 import TimeseriesWidget from "./widgets/TimeseriesWidget";
 import HeatmapWidget from "./widgets/HeatmapWidget";
 import MouseHeatmapWidget from "./widgets/MouseHeatmapWidget";
+import BreakdownWidget from "./widgets/BreakdownWidget";
+import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
 import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 
@@ -37,6 +39,10 @@ function WidgetContent({
       return <HeatmapWidget widget={widget} refreshKey={refreshKey} />;
     case "mouse_heatmap":
       return <MouseHeatmapWidget widget={widget} refreshKey={refreshKey} />;
+    case "breakdown":
+      return <BreakdownWidget widget={widget} refreshKey={refreshKey} />;
+    case "scroll_depth":
+      return <ScrollDepthWidget widget={widget} refreshKey={refreshKey} />;
   }
 }
 

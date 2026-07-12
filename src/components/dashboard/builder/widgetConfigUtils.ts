@@ -4,6 +4,8 @@ export type { PeriodPreset, TimeStep };
 
 export const PERIOD_PRESETS: PeriodPreset[] = ["1h", "24h", "7d", "30d"];
 export const TIME_STEPS: TimeStep[] = ["1h", "1d", "1w"];
+export type BreakdownDimension = "url" | "referrer";
+export const BREAKDOWN_DIMENSIONS: BreakdownDimension[] = ["url", "referrer"];
 
 const PERIOD_MS: Record<PeriodPreset, number> = {
   "1h": 60 * 60 * 1000,
@@ -51,13 +53,20 @@ export function readTagId(filters: Record<string, unknown>): number | null {
   return Number.isNaN(id) ? null : id;
 }
 
+export function readGroupBy(
+  filters: Record<string, unknown>
+): BreakdownDimension {
+  return filters.groupBy === "referrer" ? "referrer" : "url";
+}
+
 export function buildWidgetConfig(
   current: WidgetConfig,
   period: PeriodPreset,
   step: TimeStep,
   metric: WidgetConfig["metric"],
   eventType: string,
-  tagId: number | null
+  tagId: number | null,
+  groupBy?: BreakdownDimension | null
 ): WidgetConfig {
   const filters: Record<string, unknown> = {};
 
@@ -67,6 +76,10 @@ export function buildWidgetConfig(
 
   if (tagId != null) {
     filters.tagId = tagId;
+  }
+
+  if (groupBy) {
+    filters.groupBy = groupBy;
   }
 
   return {

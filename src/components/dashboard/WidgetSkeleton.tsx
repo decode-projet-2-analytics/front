@@ -34,6 +34,18 @@ export function WidgetContentSkeleton({ type }: ContentProps) {
             />
           ))}
         </div>
+      ) : type === "breakdown" || type === "scroll_depth" ? (
+        <div className="flex h-full flex-col justify-center gap-3">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <div key={index} className="flex flex-col gap-1.5">
+              <div className="h-2 w-1/3 rounded-md bg-surface-2" />
+              <div
+                className="h-2 rounded-full bg-surface-2"
+                style={{ width: `${90 - index * 15}%` }}
+              />
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="grid h-full grid-rows-7 gap-1">
           {Array.from({ length: 7 }).map((_, row) => (
