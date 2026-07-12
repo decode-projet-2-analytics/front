@@ -1,13 +1,18 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { fetchApplications } from "@/lib/applicationsApi";
+import { fetchApplicationRole, fetchApplications } from "@/lib/applicationsApi";
+import { fetchMe } from "@/lib/userApi";
+import CreateApplicationForm from "@/components/applications/CreateApplicationForm";
+import ApplicationSecretActions from "@/components/applications/ApplicationSecretActions";
 import { fetchTags } from "@/lib/tagsApi";
 import { fetchTunnels } from "@/lib/tunnelsApi";
-import CreateApplicationForm from "@/components/applications/CreateApplicationForm";
 
 export default async function ApplicationsPage() {
-  const t = await getTranslations("Applications");
-  const applications = await fetchApplications();
+  const [t, me, applications] = await Promise.all([
+    getTranslations("Applications"),
+    fetchMe(),
+    fetchApplications(),
+  ]);
 
   const counts = await Promise.all(
     applications.map(async (application) => {
@@ -15,6 +20,7 @@ export default async function ApplicationsPage() {
         fetchTags(application.id),
         fetchTunnels(application.id),
       ]);
+
       return {
         id: application.id,
         tagCount: tags.length,
@@ -22,7 +28,19 @@ export default async function ApplicationsPage() {
       };
     }),
   );
+
   const countById = new Map(counts.map((c) => [c.id, c]));
+  const roles = await Promise.all(
+    applications.map(async (application) => ({
+      id: application.id,
+      role: await fetchApplicationRole(application.id),
+    })),
+  );
+  const roleByApplication = new Map(roles.map((item) => [item.id, item.role]));
+
+  const canCreateApplication =
+    applications.length === 0 ||
+    applications.some((application) => application.ownerId === me?.id);
 
   return (
     <div className="flex flex-1 flex-col px-6 py-8 max-w-5xl mx-auto w-full gap-6">
@@ -39,6 +57,7 @@ export default async function ApplicationsPage() {
         <div className="flex flex-col gap-4">
           {applications.map((application) => {
             const count = countById.get(application.id);
+
             return (
               <div
                 key={application.id}
@@ -47,16 +66,19 @@ export default async function ApplicationsPage() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div>
                     <h2 className="text-sm font-medium">{application.name}</h2>
+
                     <p className="text-xs text-foreground-muted mt-1">
                       {t("appId")}:{" "}
                       <code className="font-mono">{application.appId}</code>
                     </p>
+
                     <p className="text-xs text-foreground-muted mt-2">
                       {t("tagCount", { count: count?.tagCount ?? 0 })}
                       {" · "}
                       {t("tunnelCount", { count: count?.tunnelCount ?? 0 })}
                     </p>
                   </div>
+
                   <div className="flex items-center gap-2 flex-wrap">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -69,6 +91,7 @@ export default async function ApplicationsPage() {
                         ? t("secretActive")
                         : t("secretMissing")}
                     </span>
+
                     <Link
                       href={`/applications/${application.id}`}
                       className="rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-hover"
@@ -77,16 +100,27 @@ export default async function ApplicationsPage() {
                     </Link>
                   </div>
                 </div>
+
+                {["owner", "admin"].includes(
+                  roleByApplication.get(application.id) ?? "",
+                ) && (
+                  <ApplicationSecretActions
+                    applicationId={application.id}
+                    hasSecret={application.hasSecret}
+                  />
+                )}
               </div>
             );
           })}
         </div>
       )}
 
-      <div className="rounded-lg border border-dashed border-border bg-surface-0 p-6">
-        <h2 className="text-sm font-medium mb-4">{t("createTitle")}</h2>
-        <CreateApplicationForm />
-      </div>
+      {canCreateApplication && (
+        <div className="rounded-lg border border-dashed border-border bg-surface-0 p-6">
+          <h2 className="text-sm font-medium mb-4">{t("createTitle")}</h2>
+          <CreateApplicationForm />
+        </div>
+      )}
     </div>
   );
 }

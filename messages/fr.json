@@ -111,6 +111,7 @@
         "general": "Général",
         "tunnels": "Tunnels",
         "tags": "Tags",
+        "team": "Équipe",
         "integration": "Intégration"
       },
       "overview": {
@@ -201,6 +202,37 @@
         "createTagsLink": "Créer des tags",
         "availableTags": "Slugs de tags disponibles",
         "openDashboard": "Ouvrir le dashboard"
+      }
+    },
+    "team": {
+      "title": "Équipe",
+      "subtitle": "Invitez des collaborateurs et gérez leurs droits sur cette application.",
+      "emailsPlaceholder": "Emails à inviter, séparés par des espaces, virgules ou retours à la ligne",
+      "invite": "Inviter",
+      "inviteError": "Impossible d'envoyer l'invitation.",
+      "inviteResult": "{sent, plural, one {# invitation envoyée} other {# invitations envoyées}} · {skipped, plural, one {# ignorée} other {# ignorées}}",
+      "genericError": "Une erreur est survenue.",
+      "member": "Membre",
+      "role": "Rôle",
+      "actions": "Actions",
+      "remove": "Retirer",
+      "pendingInvitations": "Invitations en attente",
+      "cancelInvitation": "Annuler l'invitation",
+      "roles": {
+        "owner": "Propriétaire",
+        "admin": "Administrateur",
+        "member": "Membre",
+        "viewer": "Lecteur"
+      },
+      "accept": {
+        "title": "Invitation à rejoindre une application",
+        "subtitle": "Connectez-vous pour accepter l'invitation et accéder à l'application partagée.",
+        "authRequired": "Vous devez être connecté avec le compte invité pour accepter cette invitation.",
+        "login": "Se connecter",
+        "register": "Créer un compte",
+        "submit": "Accepter l'invitation",
+        "loading": "Acceptation…",
+        "error": "Impossible d'accepter l'invitation."
       }
     }
   },
@@ -408,6 +440,10 @@
     "status_pending": "En attente",
     "status_validated": "Validé",
     "status_rejected": "Refusé",
+    "role_owner": "Propriétaire",
+    "role_admin": "Administrateur",
+    "role_member": "Membre",
+    "role_viewer": "Lecteur",
     "widgetsPlaceholder": "Vos widgets apparaîtront ici - configurez votre premier widget depuis le menu.",
     "title": "Dashboard",
     "live": "Live",
