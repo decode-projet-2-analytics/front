@@ -43,6 +43,12 @@ export default function BackofficeHeader({ isAdmin = false }: Props) {
               >
                 {t("nav.support")}
               </Link>
+              <Link
+                href="/profile"
+                className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
+              >
+                {t("nav.profile")}
+              </Link>
             </>
           )}
           {isAdmin && showAppNav && <AdminNavDropdown />}
