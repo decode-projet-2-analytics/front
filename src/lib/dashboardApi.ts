@@ -8,8 +8,9 @@ export type WidgetType =
   | "funnel"
   | "mouse_heatmap"
   | "breakdown"
-  | "scroll_depth";
-export type WidgetMetric = "count" | "sessions" | "share" | "rate";
+  | "scroll_depth"
+  | "retention";
+export type WidgetMetric = "count" | "sessions" | "share" | "rate" | "scroll_depth" | "retention";
 export type PeriodPreset = "1h" | "24h" | "7d" | "30d";
 export type TimeStep = "1h" | "1d" | "1w";
 export type EventVisualization =
@@ -162,11 +163,18 @@ export interface ScrollDepthWidgetData {
   sessionsTracked: number;
 }
 
+export interface RetentionWidgetData {
+  rate: number;
+  returning: number;
+  total: number;
+}
+
 export type WidgetData =
   | FunnelWidgetData
   | EventsWidgetData
   | BreakdownWidgetData
-  | ScrollDepthWidgetData;
+  | ScrollDepthWidgetData
+  | RetentionWidgetData;
 
 export async function fetchWidgets(applicationId: number): Promise<Widget[]> {
   const res = await apiFetch(

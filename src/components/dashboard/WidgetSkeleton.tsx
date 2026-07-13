@@ -11,6 +11,7 @@ interface CardProps {
 function contentHeight(type: WidgetType): string {
   if (type === "events") return "h-40";
   if (type === "funnel") return "h-48";
+  if (type === "retention") return "h-32";
   return "h-48";
 }
 
@@ -46,6 +47,11 @@ export function WidgetContentSkeleton({ type }: ContentProps) {
             </div>
           ))}
         </div>
+      ) : type === "retention" ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3">
+            <div className="h-10 w-24 rounded-md bg-surface-2" />
+            <div className="h-3 w-16 rounded-md bg-surface-2" />
+          </div>
       ) : type === "breakdown" || type === "scroll_depth" ? (
         <div className="flex h-full flex-col justify-center gap-3">
           {Array.from({ length: 5 }).map((_, index) => (

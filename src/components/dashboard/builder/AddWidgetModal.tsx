@@ -22,6 +22,7 @@ const WIDGET_TYPES: WidgetType[] = [
 
   "scroll_depth",
 
+  "retention",
 ];
 
 

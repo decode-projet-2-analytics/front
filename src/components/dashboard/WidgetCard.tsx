@@ -23,6 +23,8 @@ import FunnelWidget from "./widgets/FunnelWidget";
 import EventsWidget from "./widgets/EventsWidget";
 import BreakdownWidget from "./widgets/BreakdownWidget";
 import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
+import RetentionWidget from "./widgets/RetentionWidget";
+import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 
 interface Props {
@@ -83,12 +85,14 @@ function WidgetContent({
       );
     case "scroll_depth":
       return (
-        <ScrollDepthWidget
-          widget={widget}
-          refreshKey={refreshKey}
-          liveData={liveData as ScrollDepthWidgetData | null}
-        />
+          <ScrollDepthWidget
+              widget={widget}
+              refreshKey={refreshKey}
+              liveData={liveData as ScrollDepthWidgetData | null}
+          />
       );
+      case "retention":
+      return <RetentionWidget widget={widget} refreshKey={refreshKey} />;
   }
 }
 
