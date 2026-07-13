@@ -3,7 +3,7 @@
 import { ChangeEvent, FormEvent, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { API_BASE_URL } from "@/lib/env";
+import { apiFetchClient } from "@/lib/api";
 import { updateMe, type CurrentUser } from "@/lib/userApi";
 
 interface Props {
@@ -61,17 +61,18 @@ export default function ProfileCompanyForm({ user }: Props) {
         const uploadData = new FormData();
         uploadData.append("kbis", kbisFile);
 
-        const uploadResponse = await fetch(`${API_BASE_URL}/auth/kbis`, {
-          method: "POST",
-          body: uploadData,
-        });
+        const uploadResponse = await apiFetchClient(
+          "/auth/kbis",
+          { method: "POST" },
+          uploadData,
+        );
 
         if (!uploadResponse.ok) {
           setError(t("errorKbis"));
           return;
         }
 
-        const data = (await uploadResponse.json()) as { kbisDocument: string };
+        const data = uploadResponse.body as { kbisDocument: string };
         kbisDocument = data.kbisDocument;
       } catch {
         setError(t("errorKbis"));

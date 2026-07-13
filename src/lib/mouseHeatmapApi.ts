@@ -1,7 +1,6 @@
 "use server";
 
-import { getTokenServer } from "./auth";
-import { API_BASE_URL } from "./env";
+import { apiFetch } from "./api";
 
 /** Period presets supported by the mouse-heatmap endpoints. */
 export type HeatmapPeriod = "today" | "7d" | "30d";
@@ -43,11 +42,6 @@ export interface PageSnapshotData {
   capturedAt: string;
 }
 
-async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = await getTokenServer();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 /**
  * List the pages that have mouse-tracking data for an application/period.
  * Returns [] on any error (same convention as the other dashboard clients).
@@ -56,12 +50,11 @@ export async function fetchTrackedPages(
   applicationId: number,
   period: HeatmapPeriod
 ): Promise<TrackedPage[]> {
-  const url = new URL(`${API_BASE_URL}/analytics/mouse/pages`);
-  url.searchParams.set("applicationId", String(applicationId));
-  url.searchParams.set("period", period);
-
-  const res = await fetch(url.toString(), {
-    headers: await getAuthHeaders(),
+  const params = new URLSearchParams({
+    applicationId: String(applicationId),
+    period,
+  });
+  const res = await apiFetch(`/analytics/mouse/pages?${params.toString()}`, {
     cache: "no-store",
   });
 
@@ -78,15 +71,15 @@ export async function fetchMouseMovements(
   page: string,
   period: HeatmapPeriod
 ): Promise<MouseMovements | null> {
-  const url = new URL(`${API_BASE_URL}/analytics/mouse/movements`);
-  url.searchParams.set("applicationId", String(applicationId));
-  url.searchParams.set("page", page);
-  url.searchParams.set("period", period);
-
-  const res = await fetch(url.toString(), {
-    headers: await getAuthHeaders(),
-    cache: "no-store",
+  const params = new URLSearchParams({
+    applicationId: String(applicationId),
+    page,
+    period,
   });
+  const res = await apiFetch(
+    `/analytics/mouse/movements?${params.toString()}`,
+    { cache: "no-store" },
+  );
 
   if (!res.ok) return null;
   return res.json();
@@ -100,14 +93,14 @@ export async function fetchPageSnapshot(
   applicationId: number,
   page: string
 ): Promise<PageSnapshotData | null> {
-  const url = new URL(`${API_BASE_URL}/analytics/mouse/snapshot`);
-  url.searchParams.set("applicationId", String(applicationId));
-  url.searchParams.set("page", page);
-
-  const res = await fetch(url.toString(), {
-    headers: await getAuthHeaders(),
-    cache: "no-store",
+  const params = new URLSearchParams({
+    applicationId: String(applicationId),
+    page,
   });
+  const res = await apiFetch(
+    `/analytics/mouse/snapshot?${params.toString()}`,
+    { cache: "no-store" },
+  );
 
   if (res.status === 204 || !res.ok) return null;
   return res.json();

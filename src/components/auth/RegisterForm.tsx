@@ -3,8 +3,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { API_BASE_URL } from "@/lib/env";
-
+import { apiFetchClient } from "@/lib/api";
 const TOTAL_STEPS = 3;
 
 const formStepClassName = "flex min-h-[34rem] flex-col space-y-6";
@@ -16,9 +15,7 @@ const labelClassName = "block text-sm font-medium text-foreground-secondary";
 
 const fieldClassName = "space-y-1.5";
 
-const PHONE_COUNTRY_CODES = [
-  { value: "+33", label: "+33" }
-] as const;
+const PHONE_COUNTRY_CODES = [{ value: "+33", label: "+33" }] as const;
 
 const initialFormData = {
   firstname: "",
@@ -168,21 +165,22 @@ export default function RegisterForm({ invitationToken = null }: Props) {
       const uploadData = new FormData();
       uploadData.append("kbis", kbisFile);
 
-      const uploadResponse = await fetch(`${API_BASE_URL}/auth/kbis`, {
-        method: "POST",
-        body: uploadData,
-      });
+      const uploadResponse = await apiFetchClient(
+        "/auth/kbis",
+        { method: "POST" },
+        uploadData,
+      );
 
       if (!uploadResponse.ok) {
         setError(t("errorKbis"));
         return;
       }
 
-      const { kbisDocument } = (await uploadResponse.json()) as {
+      const { kbisDocument } = uploadResponse.body as {
         kbisDocument: string;
       };
 
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      const response = await apiFetchClient(`/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -204,11 +202,11 @@ export default function RegisterForm({ invitationToken = null }: Props) {
       }
 
       if (!response.ok) {
-        setError((await readApiError(response)) ?? t("error"));
+        setError((await readApiError(response as Response)) ?? t("error"));
         return;
       }
 
-      const data = (await response.json()) as {
+      const data = (await response.body) as {
         invitationAccepted?: boolean;
         applicationId?: number;
       };
@@ -244,28 +242,67 @@ export default function RegisterForm({ invitationToken = null }: Props) {
             <label htmlFor="firstname" className={labelClassName}>
               {t("firstname")}
             </label>
-            <input id="firstname" name="firstname" type="text" value={formData.firstname ?? ""} onChange={handleChange} placeholder={t("firstname")} required className={inputClassName}/>
+            <input
+              id="firstname"
+              name="firstname"
+              type="text"
+              value={formData.firstname ?? ""}
+              onChange={handleChange}
+              placeholder={t("firstname")}
+              required
+              className={inputClassName}
+            />
           </div>
 
           <div className={fieldClassName}>
             <label htmlFor="lastname" className={labelClassName}>
               {t("lastname")}
             </label>
-            <input id="lastname" name="lastname" type="text" value={formData.lastname ?? ""} onChange={handleChange} placeholder={t("lastname")} required className={inputClassName}/>
+            <input
+              id="lastname"
+              name="lastname"
+              type="text"
+              value={formData.lastname ?? ""}
+              onChange={handleChange}
+              placeholder={t("lastname")}
+              required
+              className={inputClassName}
+            />
           </div>
 
           <div className={fieldClassName}>
             <label htmlFor="email" className={labelClassName}>
               {t("email")}
             </label>
-            <input id="email" name="email" type="email" value={formData.email ?? ""} onChange={handleChange} placeholder={t("email")} required autoComplete="email" className={inputClassName}/>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email ?? ""}
+              onChange={handleChange}
+              placeholder={t("email")}
+              required
+              autoComplete="email"
+              className={inputClassName}
+            />
           </div>
 
           <div className={fieldClassName}>
             <label htmlFor="password" className={labelClassName}>
               {t("password")}
             </label>
-            <input id="password" name="password" type="password" value={formData.password ?? ""} onChange={handleChange} placeholder={t("password")} required minLength={8} autoComplete="new-password" className={inputClassName}/>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password ?? ""}
+              onChange={handleChange}
+              placeholder={t("password")}
+              required
+              minLength={8}
+              autoComplete="new-password"
+              className={inputClassName}
+            />
           </div>
 
           <div className={fieldClassName}>
@@ -273,14 +310,32 @@ export default function RegisterForm({ invitationToken = null }: Props) {
               {t("contactPhone")}
             </label>
             <div className="flex gap-2">
-              <select id="phoneCountryCode" name="phoneCountryCode" value={formData.phoneCountryCode ?? "+33"} onChange={handleChange} aria-label={t("phoneCountryCode")} className="w-24 shrink-0 rounded-md border border-border bg-surface-2 px-2 py-2 text-sm">
+              <select
+                id="phoneCountryCode"
+                name="phoneCountryCode"
+                value={formData.phoneCountryCode ?? "+33"}
+                onChange={handleChange}
+                aria-label={t("phoneCountryCode")}
+                className="w-24 shrink-0 rounded-md border border-border bg-surface-2 px-2 py-2 text-sm"
+              >
                 {PHONE_COUNTRY_CODES.map(({ value, label }) => (
                   <option key={value} value={value}>
                     {label}
                   </option>
                 ))}
               </select>
-              <input id="contactPhone" name="contactPhone" type="tel" value={formData.contactPhone ?? ""} onChange={handleChange} placeholder={t("contactPhonePlaceholder")} required autoComplete="tel-national" inputMode="tel" className={`${inputClassName} min-w-0 flex-1`}/>
+              <input
+                id="contactPhone"
+                name="contactPhone"
+                type="tel"
+                value={formData.contactPhone ?? ""}
+                onChange={handleChange}
+                placeholder={t("contactPhonePlaceholder")}
+                required
+                autoComplete="tel-national"
+                inputMode="tel"
+                className={`${inputClassName} min-w-0 flex-1`}
+              />
             </div>
           </div>
         </div>
@@ -288,7 +343,11 @@ export default function RegisterForm({ invitationToken = null }: Props) {
         <div className="mt-auto space-y-4">
           {stepError && <p className="text-sm text-error">{stepError}</p>}
 
-          <button type="button" onClick={handleNextStep} className="w-full rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover">
+          <button
+            type="button"
+            onClick={handleNextStep}
+            className="w-full rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover"
+          >
             {t("next")}
           </button>
         </div>
@@ -306,7 +365,9 @@ export default function RegisterForm({ invitationToken = null }: Props) {
           </p>
         </div>
 
-        <p className="text-sm text-foreground-secondary">{t("kbisStepIntro")}</p>
+        <p className="text-sm text-foreground-secondary">
+          {t("kbisStepIntro")}
+        </p>
 
         <div className="space-y-4">
           <div className={fieldClassName}>
@@ -367,10 +428,18 @@ export default function RegisterForm({ invitationToken = null }: Props) {
           {stepError && <p className="text-sm text-error">{stepError}</p>}
 
           <div className="flex gap-3">
-            <button type="button" onClick={handlePrevStep} className="flex-1 rounded-md border border-border py-2 text-sm font-medium hover:bg-surface-2">
+            <button
+              type="button"
+              onClick={handlePrevStep}
+              className="flex-1 rounded-md border border-border py-2 text-sm font-medium hover:bg-surface-2"
+            >
               {t("previous")}
             </button>
-            <button type="button" onClick={handleNextStep} className="flex-1 rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover">
+            <button
+              type="button"
+              onClick={handleNextStep}
+              className="flex-1 rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover"
+            >
               {t("next")}
             </button>
           </div>
@@ -412,7 +481,10 @@ export default function RegisterForm({ invitationToken = null }: Props) {
 
         <div className="rounded-lg border border-border bg-surface-2 px-4 py-2">
           {recap.map(({ label, value }) => (
-            <div key={label} className="flex justify-between gap-4 border-b border-border py-2 text-sm last:border-0">
+            <div
+              key={label}
+              className="flex justify-between gap-4 border-b border-border py-2 text-sm last:border-0"
+            >
               <span className="text-foreground-secondary">{label}</span>
               <span className="text-right font-medium break-all">{value}</span>
             </div>
@@ -430,7 +502,9 @@ export default function RegisterForm({ invitationToken = null }: Props) {
               onChange={handleChange}
               className="mt-0.5 h-4 w-4 shrink-0 rounded border-border"
             />
-            <span className="text-foreground-secondary">{t("acceptTerms")}</span>
+            <span className="text-foreground-secondary">
+              {t("acceptTerms")}
+            </span>
           </label>
         </div>
 
@@ -439,10 +513,18 @@ export default function RegisterForm({ invitationToken = null }: Props) {
           {error && <p className="text-sm text-error">{error}</p>}
 
           <div className="flex gap-3">
-            <button type="button" onClick={handlePrevStep} className="flex-1 rounded-md border border-border py-2 text-sm font-medium hover:bg-surface-2">
+            <button
+              type="button"
+              onClick={handlePrevStep}
+              className="flex-1 rounded-md border border-border py-2 text-sm font-medium hover:bg-surface-2"
+            >
               {t("previous")}
             </button>
-            <button type="submit" disabled={!formData.acceptTerms || isSubmitting} className="flex-1 rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50">
+            <button
+              type="submit"
+              disabled={!formData.acceptTerms || isSubmitting}
+              className="flex-1 rounded-md bg-primary py-2 text-sm font-medium text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+            >
               {isSubmitting ? t("submitting") : t("submit")}
             </button>
           </div>

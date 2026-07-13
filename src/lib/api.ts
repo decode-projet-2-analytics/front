@@ -1,3 +1,5 @@
+"use server";
+
 import {
   clearSessionServer,
   getRefreshTokenServer,
@@ -7,10 +9,13 @@ import {
 import { API_BASE_URL } from "./env";
 
 async function send(path: string, init: RequestInit, token?: string | null,): Promise<Response> {
+  const isFormData =
+    typeof FormData !== "undefined" && init.body instanceof FormData;
+
   return fetch(`${API_BASE_URL}${path}`, {
     ...init,
     headers: {
-      "Content-Type": "application/json",
+      ...(!isFormData ? { "Content-Type": "application/json" } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },
@@ -63,4 +68,49 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
 
   await forceLogin();
   return response;
+}
+
+export type ApiFetchClientResult = {
+  ok: boolean;
+  status: number;
+  body: unknown;
+};
+
+export async function apiFetchClient(path: string, init: RequestInit = {}, formData?: FormData,): Promise<ApiFetchClientResult> {
+  const response = await apiFetch(path, {
+    ...init,
+    body: formData ?? init.body,
+  });
+
+  if (response.status === 204) {
+    return { ok: response.ok, status: response.status, body: null };
+  }
+
+  const contentType = response.headers.get("content-type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: await response.json().catch(() => null),
+    };
+  }
+
+  if (
+    contentType.includes("application/pdf") ||
+    contentType.includes("octet-stream")
+  ) {
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: Buffer.from(await response.arrayBuffer()).toString("base64"),
+    };
+  }
+
+  const text = await response.text();
+  return {
+    ok: response.ok,
+    status: response.status,
+    body: text || null,
+  };
 }

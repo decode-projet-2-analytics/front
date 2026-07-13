@@ -4,7 +4,8 @@ import { FormEvent, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { setToken, setRefreshToken, clearSession } from "@/lib/auth";
-import { API_BASE_URL } from "@/lib/env";
+import { apiFetchClient } from "@/lib/api";
+import { fetchMe } from "@/lib/userApi";
 
 interface Props {
   redirectTo?: string;
@@ -22,23 +23,16 @@ export default function LoginForm({ redirectTo = "/dashboard" }: Props) {
 
     const formData = new FormData(event.currentTarget);
 
-    let response: Response;
-    try {
-      response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.get("email"),
-          password: formData.get("password"),
-        }),
-      });
-    } catch {
-      setError(t("error"));
-      return;
-    }
+    const response = await apiFetchClient("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: formData.get("email"),
+        password: formData.get("password"),
+      }),
+    });
 
     if (response.status === 403) {
-      const body = await response.json().catch(() => ({}));
+      const body = response.body as { error?: { message?: string } };
       const message: string = body?.error?.message ?? "";
       if (message.toLowerCase().includes("attente")) {
         router.replace("/pending");
@@ -53,11 +47,11 @@ export default function LoginForm({ redirectTo = "/dashboard" }: Props) {
       return;
     }
 
-    const data: {
+    const data = response.body as {
       token?: string;
       accessToken?: string;
       refreshToken?: string;
-    } = await response.json();
+    };
     const accessToken = data.accessToken ?? data.token;
     if (!accessToken) {
       setError(t("error"));
@@ -68,15 +62,8 @@ export default function LoginForm({ redirectTo = "/dashboard" }: Props) {
     if (data.refreshToken) setRefreshToken(data.refreshToken);
 
     try {
-      const payload = JSON.parse(
-        atob(accessToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
-      );
-      const sub = payload.sub;
-      const meRes = await fetch(`${API_BASE_URL}/users/${sub}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      if (meRes.ok) {
-        const me = await meRes.json();
+      const me = await fetchMe();
+      if (me) {
         if (me.status === "pending") {
           startTransition(() => {
             router.replace("/pending");
