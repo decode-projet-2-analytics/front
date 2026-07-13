@@ -3,12 +3,26 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import type { DraggableAttributes } from "@dnd-kit/core";
-import { deleteWidget, type Widget } from "@/lib/dashboardApi";
-import KpiWidget from "./widgets/KpiWidget";
-import TimeseriesWidget from "./widgets/TimeseriesWidget";
-import HeatmapWidget from "./widgets/HeatmapWidget";
+import {
+  deleteWidget,
+  fetchTags,
+  type BreakdownWidgetData,
+  type EventsWidgetData,
+  type FunnelWidgetData,
+  type ScrollDepthWidgetData,
+  type Tag,
+  type Widget,
+} from "@/lib/dashboardApi";
+import {
+  normalizeWidgetMetric,
+  readEventsTagId,
+} from "./builder/widgetConfigUtils";
+import type { MouseHeatmapLiveData } from "./widgets/MouseHeatmapWidget";
 import MouseHeatmapWidget from "./widgets/MouseHeatmapWidget";
-import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
+import FunnelWidget from "./widgets/FunnelWidget";
+import EventsWidget from "./widgets/EventsWidget";
+import BreakdownWidget from "./widgets/BreakdownWidget";
+import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 
 interface Props {
@@ -17,6 +31,7 @@ interface Props {
   canManageWidget: boolean;
   reordering?: boolean;
   isDragging?: boolean;
+  liveData?: unknown;
   dragHandleProps?: DraggableAttributes & Record<string, unknown>;
   onDeleted: () => void;
   onUpdated: () => void;
@@ -25,19 +40,56 @@ interface Props {
 function WidgetContent({
   widget,
   refreshKey,
+  liveData,
+  onUpdated,
 }: {
   widget: Widget;
   refreshKey: number;
+  liveData: unknown;
+  onUpdated: () => void;
 }) {
   switch (widget.type) {
-    case "kpi":
-      return <KpiWidget widget={widget} refreshKey={refreshKey} />;
-    case "timeseries":
-      return <TimeseriesWidget widget={widget} refreshKey={refreshKey} />;
-    case "heatmap":
-      return <HeatmapWidget widget={widget} refreshKey={refreshKey} />;
+    case "events":
+      return (
+        <EventsWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as EventsWidgetData | null}
+        />
+      );
     case "mouse_heatmap":
-      return <MouseHeatmapWidget widget={widget} refreshKey={refreshKey} />;
+      return (
+        <MouseHeatmapWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as MouseHeatmapLiveData | null}
+          onConfigPatched={onUpdated}
+        />
+      );
+    case "funnel":
+      return (
+        <FunnelWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as FunnelWidgetData | null}
+        />
+      );
+    case "breakdown":
+      return (
+        <BreakdownWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as BreakdownWidgetData | null}
+        />
+      );
+    case "scroll_depth":
+      return (
+        <ScrollDepthWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as ScrollDepthWidgetData | null}
+        />
+      );
   }
 }
 
@@ -47,6 +99,7 @@ export default function WidgetCard({
   canManageWidget,
   reordering = false,
   isDragging = false,
+  liveData = null,
   dragHandleProps,
   onDeleted,
   onUpdated,
@@ -54,9 +107,11 @@ export default function WidgetCard({
   const t = useTranslations("Dashboard");
   const [isPending, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [editTitleOpen, setEditTitleOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
+  const [tag, setTag] = useState<Tag | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const isEvents = widget.type === "events";
+  const metric = normalizeWidgetMetric(widget.config?.metric);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -71,6 +126,29 @@ export default function WidgetCard({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (widget.type !== "events") {
+      setTag(null);
+      return;
+    }
+
+    const tagId = readEventsTagId(widget.config);
+    if (tagId === "") {
+      setTag(null);
+      return;
+    }
+
+    let cancelled = false;
+    fetchTags(widget.applicationId).then((tags) => {
+      if (cancelled) return;
+      setTag(tags.find((item) => item.id === tagId) ?? null);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [widget]);
+
   function handleDelete() {
     if (!window.confirm(t("deleteConfirm"))) return;
 
@@ -84,14 +162,21 @@ export default function WidgetCard({
     });
   }
 
+  const showTypeBadge =
+    widget.type === "funnel" ||
+    widget.type === "mouse_heatmap" ||
+    widget.type === "breakdown" ||
+    widget.type === "scroll_depth";
+
   return (
     <>
       <article
-        className={`group flex flex-col rounded-lg border border-border-subtle bg-surface-1 p-4 ${
+        data-widget-card
+        className={`group flex h-full min-h-0 flex-col overflow-hidden rounded-lg border border-border-subtle bg-surface-1 p-4 ${
           isDragging ? "shadow-lg ring-2 ring-primary/20" : ""
         }`}
       >
-        <header className="mb-4 flex items-start justify-between gap-3">
+        <header className="widget-drag-handle mb-3 flex shrink-0 cursor-grab items-start justify-between gap-3 active:cursor-grabbing">
           <div className="flex min-w-0 flex-1 items-start gap-2">
             {dragHandleProps && (
               <button
@@ -124,15 +209,31 @@ export default function WidgetCard({
               </button>
             )}
             <div className="min-w-0 flex-1">
-              <h2 className="truncate font-medium leading-snug">{widget.title}</h2>
-              <span className="mt-1.5 inline-block rounded-full bg-surface-2 px-2 py-0.5 text-xs text-foreground-muted">
-                {t(`type_${widget.type}`)}
-              </span>
+              <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <h2 className="truncate font-medium leading-snug">
+                  {widget.title}
+                </h2>
+                {isEvents && tag?.slug && (
+                  <span className="truncate font-mono text-xs text-foreground-muted">
+                    {tag.slug}
+                  </span>
+                )}
+                {!isEvents && showTypeBadge && (
+                  <span className="truncate text-xs text-foreground-muted">
+                    {t(`type_${widget.type}`)}
+                  </span>
+                )}
+              </div>
+              {isEvents && tag?.comment ? (
+                <p className="mt-0.5 truncate text-xs text-foreground-secondary">
+                  {tag.comment}
+                </p>
+              ) : null}
             </div>
           </div>
 
           {canManageWidget && (
-          <div className="flex shrink-0 items-center gap-1">
+          <div className="widget-actions flex shrink-0 items-center gap-1">
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
@@ -179,17 +280,6 @@ export default function WidgetCard({
                   <button
                     type="button"
                     role="menuitem"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setEditTitleOpen(true);
-                    }}
-                    className="flex w-full px-3 py-2 text-left text-sm hover:bg-surface-2"
-                  >
-                    {t("edit")}
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
                     disabled={isPending}
                     onClick={() => {
                       setMenuOpen(false);
@@ -206,7 +296,24 @@ export default function WidgetCard({
           )}
         </header>
 
-        <WidgetContent widget={widget} refreshKey={refreshKey} />
+        <div data-widget-body className="min-h-0 flex-1 overflow-auto">
+          <div data-widget-measure className="flex h-full min-h-0 flex-col">
+            <WidgetContent
+              widget={widget}
+              refreshKey={refreshKey}
+              liveData={liveData}
+              onUpdated={onUpdated}
+            />
+          </div>
+        </div>
+
+        {isEvents && (
+          <footer className="mt-3 shrink-0 border-t border-border-subtle pt-2">
+            <p className="text-xs text-foreground-muted">
+              {t(`metricMode_${metric}`)}
+            </p>
+          </footer>
+        )}
       </article>
 
       {canManageWidget && (

@@ -1,34 +1,91 @@
-import { getTranslations } from "next-intl/server";
-import { fetchMe } from "@/lib/userApi";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   fetchApplicationRole,
   fetchApplications,
   type ApplicationTeamRole,
 } from "@/lib/applicationsApi";
 import { getDefaultApplicationId } from "@/lib/env";
+import { fetchMe } from "@/lib/userApi";
 import DashboardView from "@/components/dashboard/DashboardView";
 
-export default async function DashboardPage() {
-  const [t, me, applications] = await Promise.all([
-    getTranslations("Dashboard"),
-    fetchMe(),
+interface Props {
+  searchParams: Promise<{ applicationId?: string }>;
+}
+
+function Field({
+  label,
+  value,
+  href,
+}: {
+  label: string;
+  value?: string | null;
+  href?: string;
+}) {
+  if (!value) return null;
+  return (
+    <div className="flex flex-col gap-1">
+      <span className="text-xs text-foreground-muted">{label}</span>
+      {href ? (
+        <a
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-accent hover:underline"
+        >
+          {value}
+        </a>
+      ) : (
+        <span className="text-sm">{value}</span>
+      )}
+    </div>
+  );
+}
+
+function StatusBadge({
+  status,
+  t,
+}: {
+  status: "pending" | "validated" | "rejected";
+  t: (key: string) => string;
+}) {
+  const styles: Record<string, string> = {
+    pending: "bg-warning/10 text-warning",
+    validated: "bg-success/10 text-success",
+    rejected: "bg-error/10 text-error",
+  };
+  return (
+    <span
+      className={`inline-flex w-fit rounded px-2 py-0.5 text-xs font-medium ${styles[status]}`}
+    >
+      {t(`status_${status}`)}
+    </span>
+  );
+}
+
+export default async function DashboardPage({ searchParams }: Props) {
+  const [applications, params, me, t, locale] = await Promise.all([
     fetchApplications(),
+    searchParams,
+    fetchMe(),
+    getTranslations("Dashboard"),
+    getLocale(),
   ]);
 
   const displayName =
     [me?.firstname, me?.lastname].filter(Boolean).join(" ") ||
     me?.email ||
-    "-";
-
+    "";
   const memberSince = me?.createdAt
-    ? new Date(me.createdAt).toLocaleDateString("fr-FR", {
+    ? new Date(me.createdAt).toLocaleDateString(locale, {
         year: "numeric",
         month: "long",
         day: "numeric",
       })
-    : null;
+    : "";
 
+  const requestedId = Number(params.applicationId);
   const defaultApplicationId =
+    applications.find((app) => app.id === requestedId)?.id ??
     applications.find((app) => app.id === getDefaultApplicationId())?.id ??
     applications[0]?.id ??
     null;
@@ -92,55 +149,5 @@ export default async function DashboardPage() {
         roleByApplication={roleByApplication}
       />
     </div>
-  );
-}
-
-function Field({
-  label,
-  value,
-  href,
-}: {
-  label: string;
-  value: string | null | undefined;
-  href?: string;
-}) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs text-foreground-muted">{label}</span>
-      {href ? (
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-primary hover:underline truncate"
-        >
-          {value ?? "-"}
-        </a>
-      ) : (
-        <span className="text-sm truncate">{value ?? "-"}</span>
-      )}
-    </div>
-  );
-}
-
-function StatusBadge({
-  status,
-  t,
-}: {
-  status: "pending" | "validated" | "rejected";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  t: any;
-}) {
-  const styles = {
-    pending: "bg-warning/10 text-warning",
-    validated: "bg-success/10 text-success",
-    rejected: "bg-error/10 text-error",
-  };
-  return (
-    <span
-      className={`inline-flex w-fit rounded-full px-2 py-0.5 text-xs font-medium ${styles[status]}`}
-    >
-      {t(`status_${status}`)}
-    </span>
   );
 }

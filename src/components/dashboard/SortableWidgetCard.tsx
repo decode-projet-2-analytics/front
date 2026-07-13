@@ -11,6 +11,7 @@ interface Props {
   refreshKey: number;
   canManageWidget: boolean;
   reordering?: boolean;
+  liveData?: unknown;
   onDeleted: () => void;
   onUpdated: () => void;
 }
@@ -20,6 +21,7 @@ export default function SortableWidgetCard({
   refreshKey,
   canManageWidget,
   reordering = false,
+  liveData = null,
   onDeleted,
   onUpdated,
 }: Props) {
@@ -50,6 +52,7 @@ export default function SortableWidgetCard({
           refreshKey={refreshKey}
           reordering={reordering}
           canManageWidget={canManageWidget}
+          liveData={liveData}
           dragHandleProps={canManageWidget ? { ...attributes, ...listeners } : undefined}
           onDeleted={onDeleted}
           onUpdated={onUpdated}

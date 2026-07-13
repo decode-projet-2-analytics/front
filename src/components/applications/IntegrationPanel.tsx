@@ -18,24 +18,19 @@ export default function IntegrationPanel({ application, tags }: Props) {
 
   const exampleTag = tags[0]?.slug ?? "buy_confirmed";
 
-  const snippet = `// Decode Analytics SDK
+  const snippet = `import { init, track } from "@analytics/sdk-browser";
+
+// Decode Analytics SDK
 const APP_ID = "${application.appId}";
 const TAG_SLUG = "${exampleTag}";
 
-// Example: track an event
-await fetch("/api/v1/events", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "X-App-Id": APP_ID,
-    "X-App-Secret": "YOUR_APP_SECRET",
-  },
-  body: JSON.stringify({
-    type: "page_view",
-    sessionId: SESSION_ID,
-    tagSlug: TAG_SLUG,
-    payload: {},
-  }),
+init({
+  appId: APP_ID,
+  endpoint: "https://your-api.example.com/api/v1/collect",
+});
+
+track(TAG_SLUG, {
+  metadata: { source: "integration-panel" },
 });`;
 
   async function copy(value: string, key: string) {

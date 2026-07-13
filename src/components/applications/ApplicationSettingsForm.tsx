@@ -93,9 +93,7 @@ export default function ApplicationSettingsForm({ application }: Props) {
         >
           {t("save")}
         </button>
-        {saved && (
-          <span className="text-xs text-success">{t("saved")}</span>
-        )}
+        {saved && <span className="text-xs text-success">{t("saved")}</span>}
         {error && <span className="text-xs text-error">{error}</span>}
       </div>
     </form>

@@ -49,6 +49,7 @@ interface Props {
   canManageWidgets: boolean;
   refreshToken?: number;
   pollTick?: number;
+  dataByWidgetId?: Record<number, unknown>;
   onRefresh?: () => void;
 }
 
@@ -61,6 +62,7 @@ export default function WidgetGrid({
   canManageWidgets,
   refreshToken = 0,
   pollTick = 0,
+  dataByWidgetId,
   onRefresh,
 }: Props) {
   const t = useTranslations("Dashboard");
