@@ -112,6 +112,7 @@ export default function WidgetCard({
   const [isPending, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
+  const [editTitleOpen, setEditTitleOpen] = useState(false);
   const [tag, setTag] = useState<Tag | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const isEvents = widget.type === "events";
@@ -270,6 +271,17 @@ export default function WidgetCard({
                   role="menu"
                   className="absolute right-0 top-full z-10 mt-1 w-44 overflow-hidden rounded-lg border border-border bg-surface-1 py-1 shadow-lg"
                 >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setEditTitleOpen(true);
+                    }}
+                    className="flex w-full px-3 py-2 text-left text-sm hover:bg-surface-2"
+                  >
+                    {t("edit")}
+                  </button>
                   <button
                     type="button"
                     role="menuitem"
