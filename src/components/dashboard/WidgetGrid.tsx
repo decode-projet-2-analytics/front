@@ -126,8 +126,7 @@ export default function WidgetGrid({
     return isRowGapEnabled(gapIndex, activeRowIndex, activeWidget, isDragging);
   }
 
-  const collisionDetection = useCallback<CollisionDetection>(
-    (args) => {
+  const collisionDetection: CollisionDetection = (args) => {
       const activeId = Number(args.active.id);
       const active = sortedWidgets.find((widget) => widget.id === activeId);
       const rows = packWidgetRows(sortedWidgets);
@@ -177,9 +176,7 @@ export default function WidgetGrid({
         ...args,
         droppableContainers: sameRowContainers,
       });
-    },
-    [sortedWidgets]
-  );
+  };
 
   const persistOrder = useCallback(
     (nextOrder: Widget[]) => {
@@ -207,17 +204,13 @@ export default function WidgetGrid({
     [applicationId, t]
   );
 
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const widget = sortedWidgets.find((item) => item.id === event.active.id);
-      setActiveWidget(widget ?? null);
-      setActiveDragWidth(event.active.rect.current.initial?.width ?? null);
-    },
-    [sortedWidgets]
-  );
+  function handleDragStart(event: DragStartEvent) {
+    const widget = sortedWidgets.find((item) => item.id === event.active.id);
+    setActiveWidget(widget ?? null);
+    setActiveDragWidth(event.active.rect.current.initial?.width ?? null);
+  }
 
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
+  function handleDragEnd(event: DragEndEvent) {
       setActiveWidget(null);
       setActiveDragWidth(null);
 
@@ -260,15 +253,13 @@ export default function WidgetGrid({
       const nextOrder = nextRows.flat();
 
       if (isSameOrder(nextOrder, sortedWidgets)) return;
-      persistOrder(nextOrder);
-    },
-    [persistOrder, sortedWidgets]
-  );
+    persistOrder(nextOrder);
+  }
 
-  const handleDragCancel = useCallback(() => {
+  function handleDragCancel() {
     setActiveWidget(null);
     setActiveDragWidth(null);
-  }, []);
+  }
 
   if (!applicationId) return null;
 
@@ -318,6 +309,7 @@ export default function WidgetGrid({
                     widget={row[0]}
                     refreshKey={pollTick}
                     canManageWidget={canManageWidgets}
+                    liveData={dataByWidgetId?.[row[0].id] ?? null}
                     onDeleted={() => onRefresh?.()}
                     onUpdated={() => onRefresh?.()}
                   />
@@ -334,6 +326,7 @@ export default function WidgetGrid({
                         widget={widget}
                         refreshKey={pollTick}
                         canManageWidget={canManageWidgets}
+                        liveData={dataByWidgetId?.[widget.id] ?? null}
                         onDeleted={() => onRefresh?.()}
                         onUpdated={() => onRefresh?.()}
                       />

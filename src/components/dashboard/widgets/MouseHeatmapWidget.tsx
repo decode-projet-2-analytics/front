@@ -207,7 +207,7 @@ export default function MouseHeatmapWidget({
     setPeriod(readMousePeriod(widget.config));
     setSelectedPage(readMousePage(widget.config));
     setPatchError(null);
-  }, [widget.config.mouse?.period, widget.config.mouse?.page, widget.id]);
+    }, [widget.config]);
 
   function patchConfig(nextPeriod: MousePeriod, nextPage: string | null) {
     startPatchTransition(async () => {

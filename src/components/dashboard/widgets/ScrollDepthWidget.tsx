@@ -45,9 +45,7 @@ export default function ScrollDepthWidget({
 
   useEffect(() => {
     let cancelled = false;
-    const isInitialLoad = data === null && !error;
-
-    if (isInitialLoad) setLoading(true);
+    setLoading(true);
     setError(false);
 
     fetchWidgetData(widget.id).then((result) => {
@@ -55,7 +53,6 @@ export default function ScrollDepthWidget({
 
       if (!isScrollDepthData(result)) {
         setError(true);
-        if (isInitialLoad) setData(null);
       } else {
         setData(result);
       }

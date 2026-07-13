@@ -32,9 +32,7 @@ export default function RetentionWidget({ widget, refreshKey = 0 }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    const isInitialLoad = data === null && !error;
-
-    if (isInitialLoad) setLoading(true);
+    setLoading(true);
     setError(false);
 
     fetchWidgetData(widget.id).then((result) => {
@@ -42,7 +40,6 @@ export default function RetentionWidget({ widget, refreshKey = 0 }: Props) {
 
       if (!isRetentionData(result)) {
         setError(true);
-        if (isInitialLoad) setData(null);
       } else {
         setData(result);
       }

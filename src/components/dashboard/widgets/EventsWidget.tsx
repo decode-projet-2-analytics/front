@@ -220,9 +220,7 @@ export default function EventsWidget({
 
   useEffect(() => {
     let cancelled = false;
-    const isInitialLoad = data === null && !error;
-
-    if (isInitialLoad) setLoading(true);
+    setLoading(true);
     setError(false);
 
     fetchWidgetData(widget.id).then((result) => {
@@ -230,7 +228,6 @@ export default function EventsWidget({
 
       if (!isEventsData(result)) {
         setError(true);
-        if (isInitialLoad) setData(null);
       } else {
         setData(result);
       }
