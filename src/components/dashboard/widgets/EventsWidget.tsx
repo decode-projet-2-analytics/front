@@ -42,7 +42,7 @@ ChartJS.register(
   BarElement,
   ArcElement,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const CHART_COLORS = [
@@ -142,7 +142,7 @@ function proportionChartOptions(): ChartOptions<"pie" | "doughnut"> {
         onClick(
           _event,
           legendItem: LegendItem,
-          legend: LegendElement<"pie" | "doughnut">
+          legend: LegendElement<"pie" | "doughnut">,
         ) {
           const index = legendItem.index;
           if (index == null) return;
@@ -189,19 +189,22 @@ function hasSeriesValues(data: EventsWidgetData): boolean {
       (series) =>
         "points" in series &&
         Array.isArray(series.points) &&
-        series.points.some((point) => point.value !== 0)
+        series.points.some((point) => point.value !== 0),
     );
   }
 
   return data.series.some(
-    (series) => "value" in series && typeof series.value === "number" && series.value !== 0
+    (series) =>
+      "value" in series &&
+      typeof series.value === "number" &&
+      series.value !== 0,
   );
 }
 
 function categoricalColors(count: number): string[] {
   return Array.from(
     { length: count },
-    (_, index) => `${CHART_COLORS[index % CHART_COLORS.length]}cc`
+    (_, index) => `${CHART_COLORS[index % CHART_COLORS.length]}cc`,
   );
 }
 
@@ -264,7 +267,7 @@ export default function EventsWidget({
 
     const values = data.series.filter(
       (series): series is { name: string; value: number } =>
-        "value" in series && typeof series.value === "number"
+        "value" in series && typeof series.value === "number",
     );
 
     return {
@@ -275,7 +278,7 @@ export default function EventsWidget({
           data: values.map((series) => series.value),
           backgroundColor: categoricalColors(values.length),
           borderColor: values.map(
-            (_, index) => CHART_COLORS[index % CHART_COLORS.length]
+            (_, index) => CHART_COLORS[index % CHART_COLORS.length],
           ),
           borderWidth: 1,
           borderRadius: visualization === "bar" ? 4 : 0,
@@ -292,14 +295,14 @@ export default function EventsWidget({
         data.series.flatMap((series) =>
           "points" in series && Array.isArray(series.points)
             ? series.points.map((point) => point.at)
-            : []
-        )
-      )
+            : [],
+        ),
+      ),
     ).sort();
 
     return {
       labels: pointTimes.map((at) =>
-        formatLabel(at, "step" in data && data.step ? data.step : "1h")
+        formatLabel(at, "step" in data && data.step ? data.step : "1h"),
       ),
       datasets: data.series.map((series, index) => {
         const points =
@@ -307,7 +310,7 @@ export default function EventsWidget({
             ? series.points
             : [];
         const pointsByTime = new Map(
-          points.map((point) => [point.at, point.value])
+          points.map((point) => [point.at, point.value]),
         );
 
         return {
@@ -348,7 +351,7 @@ export default function EventsWidget({
     const period = inferPeriod(widget.config?.timeRange);
     const valueSeries = data.series.filter(
       (series): series is { name: string; value: number } =>
-        "value" in series && typeof series.value === "number"
+        "value" in series && typeof series.value === "number",
     );
     const single = valueSeries.length === 1 ? valueSeries[0] : null;
 
@@ -493,7 +496,10 @@ export default function EventsWidget({
   if (visualization === "pie") {
     return (
       <div className={chartClassName}>
-        <Pie data={categoricalChartData} options={proportionChartOptions()} />
+        <Pie
+          data={categoricalChartData}
+          options={proportionChartOptions() as ChartOptions<"pie">}
+        />
       </div>
     );
   }
@@ -503,7 +509,7 @@ export default function EventsWidget({
       <div className={chartClassName}>
         <Doughnut
           data={categoricalChartData}
-          options={proportionChartOptions()}
+          options={proportionChartOptions() as ChartOptions<"doughnut">}
         />
       </div>
     );
