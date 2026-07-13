@@ -3,7 +3,6 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { apiFetch } from "@/lib/api";
 import { API_BASE_URL } from "@/lib/env";
 
 const TOTAL_STEPS = 3;
@@ -35,6 +34,10 @@ const initialFormData = {
 
 type FormData = typeof initialFormData;
 
+interface Props {
+  invitationToken?: string | null;
+}
+
 function formatContactPhone(countryCode: string, localNumber: string) {
   const digits = localNumber.replace(/\D/g, "");
   const normalized = digits.startsWith("0") ? digits.slice(1) : digits;
@@ -49,7 +52,16 @@ function isValidWebsiteUrl(url: string) {
   return /^https?:\/\/.+/.test(url);
 }
 
-export default function RegisterForm() {
+async function readApiError(response: Response) {
+  try {
+    const body = await response.json();
+    return body?.error?.message;
+  } catch {
+    return null;
+  }
+}
+
+export default function RegisterForm({ invitationToken = null }: Props) {
   const t = useTranslations("Auth.register");
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
@@ -170,8 +182,9 @@ export default function RegisterForm() {
         kbisDocument: string;
       };
 
-      const response = await apiFetch(`/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           firstname: formData.firstname,
           lastname: formData.lastname,
@@ -181,6 +194,7 @@ export default function RegisterForm() {
           companyName: formData.companyName.trim(),
           websiteUrl: formData.websiteUrl.trim(),
           kbisDocument,
+          ...(invitationToken ? { invitationToken } : {}),
         }),
       });
 
@@ -190,7 +204,20 @@ export default function RegisterForm() {
       }
 
       if (!response.ok) {
-        setError(t("error"));
+        setError((await readApiError(response)) ?? t("error"));
+        return;
+      }
+
+      const data = (await response.json()) as {
+        invitationAccepted?: boolean;
+        applicationId?: number;
+      };
+
+      if (data.invitationAccepted) {
+        const redirectTo = data.applicationId
+          ? `/applications/${data.applicationId}`
+          : "/applications";
+        router.replace(`/login?redirect=${encodeURIComponent(redirectTo)}`);
         return;
       }
 

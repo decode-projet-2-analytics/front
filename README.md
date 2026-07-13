@@ -1,22 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Frontend — Decode Analytics
+
+Backoffice Next.js pour la plateforme Decode Analytics.
 
 ## Getting Started
 
-First, run the development server:
+Lancer le serveur de developpement :
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+L'API backend attendue par defaut est `http://localhost:3008/api/v1`. Elle peut etre surchargee via `NEXT_PUBLIC_API_URL`.
+
+## User Story 3 — Credentials et equipe
+
+### Credentials applicatifs
+
+Dans le detail d'une application :
+
+- onglet `General` : nom de l'application et URLs autorisees CORS ;
+- actions credentials : generation et revocation du `APP_SECRET` ;
+- `APP_ID` affiche dans l'en-tete/detail et repris dans les exemples d'integration.
+
+Les actions credentials ne sont affichees qu'aux roles applicatifs `owner` et `admin`.
+
+### Gestion d'equipe
+
+La gestion d'equipe est rattachee au detail d'une application, dans l'onglet `Equipe`, place apres `Tunnels` et `Integration`.
+
+L'onglet affiche :
+
+- le proprietaire de l'application ;
+- les membres actifs ;
+- leur role applicatif (`owner`, `admin`, `member`, `viewer`) ;
+- les invitations en attente pour `owner/admin`.
+
+Permissions UI :
+
+| Role applicatif | Voir l'equipe | Inviter | Modifier roles | Retirer membre |
+|-----------------|---------------|---------|----------------|----------------|
+| `owner` | oui | oui | oui | oui |
+| `admin` | oui | oui | oui | oui |
+| `member` | oui | non | non | non |
+| `viewer` | oui | non | non | non |
+
+Le lien d'invitation permet a un utilisateur non connecte de se connecter ou de s'inscrire. En inscription invitee, le token est conserve dans l'URL puis envoye a l'API pour rattacher automatiquement le compte a l'application.
+
+### Dashboard et applications pour les membres
+
+- Le dashboard affiche le role applicatif de l'application courante, et non le role global `Webmaster`.
+- `member` et `viewer` peuvent consulter les widgets.
+- Seuls `owner/admin` voient le bouton d'ajout de widget, les menus de configuration, suppression, edition et le drag reorder.
+- Un compte qui est uniquement membre invite ne voit pas le formulaire de creation d'application.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

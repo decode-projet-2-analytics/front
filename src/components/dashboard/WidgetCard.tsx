@@ -30,6 +30,7 @@ import WidgetConfigModal from "./builder/WidgetConfigModal";
 interface Props {
   widget: Widget;
   refreshKey?: number;
+  canManageWidget: boolean;
   reordering?: boolean;
   isDragging?: boolean;
   liveData?: unknown;
@@ -99,6 +100,7 @@ function WidgetContent({
 export default function WidgetCard({
   widget,
   refreshKey = 0,
+  canManageWidget,
   reordering = false,
   isDragging = false,
   liveData = null,
@@ -234,6 +236,7 @@ export default function WidgetCard({
             </div>
           </div>
 
+          {canManageWidget && (
           <div className="widget-actions flex shrink-0 items-center gap-1">
             <div className="relative" ref={menuRef}>
               <button
@@ -294,6 +297,7 @@ export default function WidgetCard({
               )}
             </div>
           </div>
+          )}
         </header>
 
         <div data-widget-body className="min-h-0 flex-1 overflow-auto">
@@ -316,12 +320,23 @@ export default function WidgetCard({
         )}
       </article>
 
-      <WidgetConfigModal
-        open={configOpen}
-        widget={widget}
-        onClose={() => setConfigOpen(false)}
-        onUpdated={onUpdated}
-      />
+      {canManageWidget && (
+        <>
+          <EditWidgetTitleModal
+            open={editTitleOpen}
+            widget={widget}
+            onClose={() => setEditTitleOpen(false)}
+            onUpdated={onUpdated}
+          />
+
+          <WidgetConfigModal
+            open={configOpen}
+            widget={widget}
+            onClose={() => setConfigOpen(false)}
+            onUpdated={onUpdated}
+          />
+        </>
+      )}
     </>
   );
 }

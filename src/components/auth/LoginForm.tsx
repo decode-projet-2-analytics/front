@@ -6,7 +6,11 @@ import { useRouter } from "@/i18n/navigation";
 import { setToken, setRefreshToken, clearSession } from "@/lib/auth";
 import { API_BASE_URL } from "@/lib/env";
 
-export default function LoginForm() {
+interface Props {
+  redirectTo?: string;
+}
+
+export default function LoginForm({ redirectTo = "/dashboard" }: Props) {
   const t = useTranslations("Auth.login");
   const router = useRouter();
   const [, startTransition] = useTransition();
@@ -18,14 +22,20 @@ export default function LoginForm() {
 
     const formData = new FormData(event.currentTarget);
 
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    });
+    let response: Response;
+    try {
+      response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: formData.get("email"),
+          password: formData.get("password"),
+        }),
+      });
+    } catch {
+      setError(t("error"));
+      return;
+    }
 
     if (response.status === 403) {
       const body = await response.json().catch(() => ({}));
@@ -83,7 +93,7 @@ export default function LoginForm() {
     } catch {}
 
     startTransition(() => {
-      router.replace("/dashboard");
+      router.replace(redirectTo);
       router.refresh();
     });
   }

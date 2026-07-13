@@ -112,6 +112,7 @@
         "general": "General",
         "tunnels": "Tunnels",
         "tags": "Tags",
+        "team": "Team",
         "integration": "Integration"
       },
       "overview": {
@@ -202,6 +203,37 @@
         "createTagsLink": "Create tags",
         "availableTags": "Available tag slugs",
         "openDashboard": "Open dashboard"
+      }
+    },
+    "team": {
+      "title": "Team",
+      "subtitle": "Invite collaborators and manage their permissions for this application.",
+      "emailsPlaceholder": "Emails to invite, separated by spaces, commas, or line breaks",
+      "invite": "Invite",
+      "inviteError": "Could not send the invitation.",
+      "inviteResult": "{sent, plural, one {# invitation sent} other {# invitations sent}} · {skipped, plural, one {# skipped} other {# skipped}}",
+      "genericError": "Something went wrong.",
+      "member": "Member",
+      "role": "Role",
+      "actions": "Actions",
+      "remove": "Remove",
+      "pendingInvitations": "Pending invitations",
+      "cancelInvitation": "Cancel invitation",
+      "roles": {
+        "owner": "Owner",
+        "admin": "Administrator",
+        "member": "Member",
+        "viewer": "Viewer"
+      },
+      "accept": {
+        "title": "Invitation to join an application",
+        "subtitle": "Sign in to accept the invitation and access the shared application.",
+        "authRequired": "You must be signed in with the invited account to accept this invitation.",
+        "login": "Sign in",
+        "register": "Create an account",
+        "submit": "Accept invitation",
+        "loading": "Accepting…",
+        "error": "Could not accept the invitation."
       }
     }
   },
@@ -317,6 +349,13 @@
       "statusClosed": "Closed",
       "closedBanner": "This ticket is closed. You can no longer send messages.",
       "closedPlaceholder": "Ticket closed",
+      "problemTypes": {
+        "DATA_SEEMS_INCORRECT": "Data seems incorrect",
+        "CANNOT_FIND_INFORMATION": "Cannot find information",
+        "ACCESS_ISSUE": "Access issue",
+        "NEED_HELP_INTEGRATION": "Need help with integration",
+        "OTHER": "Other"
+      },
       "adminPanel": {
         "title": "User",
         "name": "Name",
@@ -453,6 +492,10 @@
     "status_pending": "Pending",
     "status_validated": "Validated",
     "status_rejected": "Rejected",
+    "role_owner": "Owner",
+    "role_admin": "Administrator",
+    "role_member": "Member",
+    "role_viewer": "Viewer",
     "widgetsPlaceholder": "Your widgets will appear here - set up your first widget from the menu.",
     "title": "Dashboard",
     "live": "Live",

@@ -107,6 +107,11 @@ export function getTokenSub(token: string): string | null {
   }
 }
 
+export async function isAuthenticated(): Promise<boolean> {
+  const token = await getTokenServer();
+  return !!token;
+}
+
 export async function getServerRole(): Promise<string | null> {
   const token = await getTokenServer();
   if (!token) return null;

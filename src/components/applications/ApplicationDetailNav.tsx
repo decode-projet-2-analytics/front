@@ -9,6 +9,7 @@ const TABS = [
   { key: "tags", href: "/tags" },
   { key: "tunnels", href: "/tunnels" },
   { key: "integration", href: "/integration" },
+  { key: "team", href: "/team" },
 ] as const;
 
 interface Props {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import type { Application } from "@/lib/applicationsApi";
+import type { Application, ApplicationTeamRole } from "@/lib/applicationsApi";
 import type { Widget } from "@/lib/dashboardApi";
 import ApplicationSelector from "./ApplicationSelector";
 import WidgetGrid from "./WidgetGrid";
@@ -17,11 +17,13 @@ const EMPTY_WIDGET_DATA: Record<number, unknown> = {};
 interface Props {
   applications: Application[];
   defaultApplicationId: number | null;
+  roleByApplication: Record<number, ApplicationTeamRole | null>;
 }
 
 export default function DashboardView({
   applications,
   defaultApplicationId,
+  roleByApplication,
 }: Props) {
   const t = useTranslations("Dashboard");
   const [applicationId, setApplicationId] = useState<number | null>(
@@ -36,7 +38,9 @@ export default function DashboardView({
   const isLiveConnected = connectionState === "connected";
   const pollTick = useWidgetPolling(isLiveConnected ? 0 : 10_000);
 
-  const canAddWidget = applicationId !== null;
+  const applicationRole = applicationId ? roleByApplication[applicationId] : null;
+  const canManageWidgets = applicationRole === "owner" || applicationRole === "admin";
+  const canAddWidget = applicationId !== null && canManageWidgets;
   const showLive = applicationId !== null;
   const liveDataByWidgetId = isLiveConnected
     ? dataByWidgetId
@@ -155,6 +159,7 @@ export default function DashboardView({
       <div className="mx-auto w-full max-w-6xl px-6 py-8">
         <WidgetGrid
           applicationId={applicationId}
+        canManageWidgets={canManageWidgets}
           refreshToken={gridRefresh}
           pollTick={pollTick}
           dataByWidgetId={liveDataByWidgetId}

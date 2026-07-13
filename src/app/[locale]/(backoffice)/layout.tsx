@@ -5,6 +5,7 @@ import {
   getServerRole,
   getAdminTokenServer,
   getImpersonatedEmail,
+  isAuthenticated,
 } from "@/lib/auth";
 
 export default async function BackofficeLayout({
@@ -15,11 +16,12 @@ export default async function BackofficeLayout({
   const role = await getServerRole();
   const adminToken = await getAdminTokenServer();
   const impersonatedEmail = adminToken ? await getImpersonatedEmail() : null;
+  const authenticated = await isAuthenticated();
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col">
       {impersonatedEmail && <ImpersonateBanner email={impersonatedEmail} />}
-      <BackofficeHeader isAdmin={role === "Admin"} />
+      {authenticated && <BackofficeHeader isAdmin={role === "Admin"} />}
       <main className="flex min-h-0 flex-1 flex-col">{children}</main>
       <BackofficeFooter />
     </div>
