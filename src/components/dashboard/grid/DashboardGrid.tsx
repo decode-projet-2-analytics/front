@@ -42,6 +42,7 @@ type GridLayoutItems = Layout;
 interface Props {
   widgets: Widget[];
   refreshKey: number;
+  canManageWidget?: boolean;
   dataByWidgetId?: Record<number, unknown>;
   onRefresh?: () => void;
 }
@@ -138,6 +139,7 @@ function withGridConstraints(items: GridLayoutItems): GridLayoutItem[] {
 export default function DashboardGrid({
   widgets,
   refreshKey,
+  canManageWidget = true,
   dataByWidgetId,
   onRefresh,
 }: Props) {
@@ -183,7 +185,7 @@ export default function DashboardGrid({
     });
   }, [widgets, widgetsIdentity]);
 
-  const flushPendingLayouts = useCallback(async () => {
+  const flushPendingLayouts = useCallback(async function flushPendingLayouts() {
     if (savingRef.current || pendingLayoutsRef.current.size === 0) return;
 
     const pending = Array.from(pendingLayoutsRef.current.entries());
@@ -308,6 +310,7 @@ export default function DashboardGrid({
           <WidgetCard
             widget={widget}
             refreshKey={refreshKey}
+            canManageWidget={canManageWidget}
             liveData={dataByWidgetId?.[widget.id] ?? null}
             onDeleted={() => onRefresh?.()}
             onUpdated={() => onRefresh?.()}

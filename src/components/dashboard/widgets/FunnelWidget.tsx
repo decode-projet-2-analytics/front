@@ -60,12 +60,7 @@ export default function FunnelWidget({
     }
 
     let cancelled = false;
-    const isInitialLoad = data === null && !error;
-
-    if (isInitialLoad) {
-      setLoading(true);
-    }
-
+    setLoading(true);
     setError(null);
 
     fetchWidgetData(widget.id).then((result) => {
@@ -73,7 +68,6 @@ export default function FunnelWidget({
 
       if (!isFunnelData(result)) {
         setError(t("funnelLoadError"));
-        if (isInitialLoad) setData(null);
       } else {
         setData(result);
       }

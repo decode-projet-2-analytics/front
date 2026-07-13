@@ -34,6 +34,7 @@ export default function SupportChat({
 
   const { socket, connectionState } = useSocket(CHAT_NAMESPACE);
   const backHref = "/help";
+  const conversationId = conversation.conversationId;
   const isClosed = status === "closed";
   const connectionReady = connectionState === "connected";
 
@@ -57,8 +58,6 @@ export default function SupportChat({
     if (!socket) return;
 
     const activeSocket = socket;
-    const { conversationId } = conversation;
-
     function joinConversation() {
       activeSocket.emit(CHAT_EVENTS.CONVERSATION_JOIN, { conversationId });
     }
@@ -123,7 +122,7 @@ export default function SupportChat({
       activeSocket.off(CHAT_EVENTS.TYPING_STOP, onTypingStop);
       activeSocket.off(CHAT_EVENTS.CONVERSATION_STATUS, onConversationStatus);
     };
-  }, [socket, conversation.conversationId, currentUserId]);
+  }, [socket, conversationId, currentUserId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

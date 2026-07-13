@@ -1,7 +1,6 @@
 "use server";
 
 import { apiFetch } from "./api";
-import { getTokenServer } from "./auth";
 
 export type ConversationStatus = "open" | "closed";
 

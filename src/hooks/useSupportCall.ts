@@ -50,7 +50,9 @@ export function useSupportCall({
   const isCallerRef = useRef(false);
   const outgoingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  callStateRef.current = callState;
+  useEffect(() => {
+    callStateRef.current = callState;
+  }, [callState]);
 
   const cleanup = useCallback(() => {
     if (outgoingTimeoutRef.current) {

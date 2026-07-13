@@ -24,7 +24,6 @@ import EventsWidget from "./widgets/EventsWidget";
 import BreakdownWidget from "./widgets/BreakdownWidget";
 import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
 import RetentionWidget from "./widgets/RetentionWidget";
-import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 
 interface Props {
@@ -334,13 +333,6 @@ export default function WidgetCard({
 
       {canManageWidget && (
         <>
-          <EditWidgetTitleModal
-            open={editTitleOpen}
-            widget={widget}
-            onClose={() => setEditTitleOpen(false)}
-            onUpdated={onUpdated}
-          />
-
           <WidgetConfigModal
             open={configOpen}
             widget={widget}

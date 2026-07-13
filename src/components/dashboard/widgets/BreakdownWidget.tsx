@@ -66,9 +66,7 @@ export default function BreakdownWidget({
 
   useEffect(() => {
     let cancelled = false;
-    const isInitialLoad = data === null && !error;
-
-    if (isInitialLoad) setLoading(true);
+    setLoading(true);
     setError(false);
 
     fetchWidgetData(widget.id).then((result) => {
@@ -76,7 +74,6 @@ export default function BreakdownWidget({
 
       if (!isBreakdownData(result)) {
         setError(true);
-        if (isInitialLoad) setData(null);
       } else {
         setData(result);
       }

@@ -9,29 +9,10 @@ interface Props {
   conversation: Conversation;
 }
 
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | null | undefined;
-}) {
-  if (!value) return null;
-
-  return (
-    <div>
-      <dt className="text-xs text-foreground-muted">{label}</dt>
-      <dd className="text-sm text-foreground">{value}</dd>
-    </div>
-  );
-}
-
 export default function SupportConversationAdminPanel({ conversation }: Props) {
   const t = useTranslations("Support.chat.adminPanel");
-  const tDashboard = useTranslations("Dashboard");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(false);
-  const user = conversation.user;
 
   function handleClose() {
     if (conversation.status === "closed") return;

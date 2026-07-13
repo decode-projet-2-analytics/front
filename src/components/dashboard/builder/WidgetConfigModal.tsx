@@ -51,7 +51,7 @@ export default function WidgetConfigModal({
     if (!open || !isMouse) return;
 
     setMousePeriod(readMousePeriod(widget.config));
-  }, [open, isMouse, widget.id, widget.config?.mouse?.period]);
+  }, [open, isMouse, widget.config]);
 
   useEffect(() => {
     if (!open || !isMouse) return;
@@ -115,6 +115,7 @@ export default function WidgetConfigModal({
 
         <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
           <WidgetConfigForm
+            key={widget.id}
             widget={widget}
             tags={tags}
             tunnels={tunnels}

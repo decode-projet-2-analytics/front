@@ -128,29 +128,6 @@ export default function WidgetConfigForm({
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    // Remount resets local state; only re-sync if the same form stays open
-    // for a different widget id (should not normally happen).
-    setTitle(widget.title);
-    setPeriod(inferPeriod(widget.config?.timeRange));
-    setStep((widget.config?.timeRange?.step as TimeStep) || "1h");
-    setMetric(
-      widget.type === "breakdown"
-        ? readBreakdownMetric(widget.config?.metric)
-        : normalizeWidgetMetric(widget.config?.metric)
-    );
-    setEventType(readEventType(widget.config?.filters));
-    setEventVisualization(readEventVisualization(widget.config));
-    setEventTagId(readEventsTagId(widget.config));
-    setEventSeries(readEventSeries(widget.config));
-    setTagId(readTagId(widget.config?.filters) ?? "");
-    setTunnelId(readTunnelId(widget.config));
-    setMousePeriod(readMousePeriod(widget.config));
-    setMousePage(readMousePage(widget.config) ?? "");
-    setGroupBy(readGroupBy(widget.config?.filters ?? {}));
-    setError(null);
-  }, [widget.id]);
-
-  useEffect(() => {
     if (!isMouse || loadingTrackedPages) return;
 
     const savedPage = readMousePage(widget.config);
