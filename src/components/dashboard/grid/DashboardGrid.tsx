@@ -294,8 +294,8 @@ export default function DashboardGrid({
       draggableHandle=".widget-drag-handle"
       draggableCancel="button, a, input, textarea, select, [role='menu']"
       compactType="vertical"
-      isResizable
-      isDraggable
+      isResizable={canManageWidget}
+      isDraggable={canManageWidget}
       onLayoutChange={handleLayoutChange}
       onDragStop={handleLayoutStop}
       onResizeStop={handleLayoutStop}

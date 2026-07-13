@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import type { DraggableAttributes } from "@dnd-kit/core";
 import {
   deleteWidget,
   fetchTags,
@@ -25,15 +24,13 @@ import BreakdownWidget from "./widgets/BreakdownWidget";
 import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
 import RetentionWidget from "./widgets/RetentionWidget";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
+import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 
 interface Props {
   widget: Widget;
   refreshKey?: number;
   canManageWidget: boolean;
-  reordering?: boolean;
-  isDragging?: boolean;
   liveData?: unknown;
-  dragHandleProps?: DraggableAttributes & Record<string, unknown>;
   onDeleted: () => void;
   onUpdated: () => void;
 }
@@ -100,10 +97,7 @@ export default function WidgetCard({
   widget,
   refreshKey = 0,
   canManageWidget,
-  reordering = false,
-  isDragging = false,
   liveData = null,
-  dragHandleProps,
   onDeleted,
   onUpdated,
 }: Props) {
@@ -176,42 +170,16 @@ export default function WidgetCard({
     <>
       <article
         data-widget-card
-        className={`group flex h-full min-h-0 flex-col overflow-hidden rounded-lg border border-border-subtle bg-surface-1 p-4 ${
-          isDragging ? "shadow-lg ring-2 ring-primary/20" : ""
-        }`}
+        className="group flex h-full min-h-0 flex-col overflow-hidden rounded-lg border border-border-subtle bg-surface-1 p-4"
       >
-        <header className="widget-drag-handle mb-3 flex shrink-0 cursor-grab items-start justify-between gap-3 active:cursor-grabbing">
+        <header
+          className={`mb-3 flex shrink-0 items-start justify-between gap-3 ${
+            canManageWidget
+              ? "widget-drag-handle cursor-grab active:cursor-grabbing"
+              : ""
+          }`}
+        >
           <div className="flex min-w-0 flex-1 items-start gap-2">
-            {dragHandleProps && (
-              <button
-                type="button"
-                disabled={reordering}
-                aria-label={t("dragWidget")}
-                title={t("dragWidgetHint")}
-                className="mt-0.5 shrink-0 cursor-grab rounded p-1 text-foreground-muted touch-none hover:bg-surface-2 hover:text-foreground active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-40"
-                {...dragHandleProps}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <circle cx="9" cy="5" r="1" />
-                  <circle cx="9" cy="12" r="1" />
-                  <circle cx="9" cy="19" r="1" />
-                  <circle cx="15" cy="5" r="1" />
-                  <circle cx="15" cy="12" r="1" />
-                  <circle cx="15" cy="19" r="1" />
-                </svg>
-              </button>
-            )}
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-0.5">
                 <h2 className="truncate font-medium leading-snug">
@@ -337,6 +305,12 @@ export default function WidgetCard({
             open={configOpen}
             widget={widget}
             onClose={() => setConfigOpen(false)}
+            onUpdated={onUpdated}
+          />
+          <EditWidgetTitleModal
+            open={editTitleOpen}
+            widget={widget}
+            onClose={() => setEditTitleOpen(false)}
             onUpdated={onUpdated}
           />
         </>

@@ -220,41 +220,6 @@ export async function fetchTags(applicationId: number): Promise<Tag[]> {
   return res.json();
 }
 
-export async function saveWidgetOrder(widgets: Widget[]): Promise<boolean> {
-  for (let i = 0; i < widgets.length; i++) {
-    const tempPosition = -(i + 1);
-    const movedToTemp = await updateWidget(widgets[i].id, { position: tempPosition });
-    if (!movedToTemp) return false;
-  }
-
-  for (let i = 0; i < widgets.length; i++) {
-    const movedToFinal = await updateWidget(widgets[i].id, { position: i });
-    if (!movedToFinal) return false;
-  }
-
-  return true;
-}
-
-export async function moveWidgetInList(
-  widgets: Widget[],
-  widgetId: number,
-  direction: "up" | "down"
-): Promise<boolean> {
-  const sorted = [...widgets].sort(
-    (a, b) => a.position - b.position || a.id - b.id
-  );
-  const index = sorted.findIndex((widget) => widget.id === widgetId);
-  const targetIndex = direction === "up" ? index - 1 : index + 1;
-
-  if (index < 0 || targetIndex < 0 || targetIndex >= sorted.length) {
-    return false;
-  }
-
-  [sorted[index], sorted[targetIndex]] = [sorted[targetIndex], sorted[index]];
-
-  return saveWidgetOrder(sorted);
-}
-
 export async function fetchWidgetData(id: number): Promise<WidgetData | null> {
   try {
     const res = await apiFetch(`/widgets/${id}/data`, { cache: "no-store" });
