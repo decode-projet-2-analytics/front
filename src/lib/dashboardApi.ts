@@ -1,11 +1,26 @@
 "use server";
 
 import { apiFetch } from "./api";
+import type { WidgetSeries } from "./metadataFilters";
 
-export type WidgetType = "kpi" | "timeseries" | "heatmap" | "mouse_heatmap";
-export type WidgetMetric = "count" | "rate";
+export type WidgetType = "events" | "funnel" | "mouse_heatmap";
+export type WidgetMetric = "count" | "sessions" | "share" | "rate";
 export type PeriodPreset = "1h" | "24h" | "7d" | "30d";
 export type TimeStep = "1h" | "1d" | "1w";
+export type EventVisualization =
+  | "nombre"
+  | "line"
+  | "bar"
+  | "pie"
+  | "doughnut"
+  | "activity";
+
+export interface WidgetLayout {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 
 export interface WidgetConfig {
   filters: Record<string, unknown>;
@@ -13,8 +28,19 @@ export interface WidgetConfig {
     from: string | null;
     to: string | null;
     step: string;
+    /** Sliding window preset; preferred over absolute from/to when present. */
+    preset?: PeriodPreset;
   };
   metric: WidgetMetric;
+  tagId?: number;
+  visualization?: EventVisualization;
+  series?: WidgetSeries[];
+  tunnelId?: number;
+  mouse?: {
+    period: "today" | "7d" | "30d";
+    page: string | null;
+  };
+  layout?: WidgetLayout;
 }
 
 export interface Widget {
@@ -52,58 +78,63 @@ export interface Tag {
   updatedAt: string;
 }
 
-export interface KpiWidgetData {
-  value: number;
-  metric: WidgetMetric;
-  count?: number;
-  uniqueSessions?: number;
-}
-
 export interface TimeseriesPoint {
   at: string;
   value: number;
 }
 
-export interface TimeseriesWidgetData {
-  metric: WidgetMetric;
-  step: string;
-  points: TimeseriesPoint[];
+export interface FunnelStep {
+  index: number;
+  tagId: number;
+  slug: string;
+  label: string;
+  count: number;
 }
 
-export interface HeatmapCell {
-  row: number;
-  col: number;
+export interface FunnelDropOff {
+  fromIndex: number;
+  toIndex: number;
+  lost: number;
+  rate: number;
+}
+
+export interface FunnelWidgetData {
+  tunnelId: number;
+  tunnelName: string;
+  metric: "count";
+  steps: FunnelStep[];
+  conversionRate: number;
+  dropOff: FunnelDropOff[];
+}
+
+export interface EventsSeriesValue {
+  name: string;
   value: number;
 }
 
-export type HeatmapLayout =
-  | "single"
-  | "minute_slots"
-  | "hour_of_day"
-  | "day_hour"
-  | "weekday_hour"
-  | "day_slots"
-  | "week_slots";
-
-export interface HeatmapWidgetData {
-  metric: WidgetMetric;
-  step: string;
-  layout: HeatmapLayout;
-  rows: number;
-  cols: number;
-  labelKey: string;
-  rowLabelType: "weekday" | "day_index" | "none";
-  colLabelType: "hour" | "minute" | "day_index" | "week_index" | "none";
-  slotCount: number | null;
-  cells: HeatmapCell[];
-  max: number;
-  total: number;
+export interface EventsSeriesPoint {
+  name: string;
+  points: TimeseriesPoint[];
 }
 
-export type WidgetData =
-  | KpiWidgetData
-  | TimeseriesWidgetData
-  | HeatmapWidgetData;
+export interface EventsKpiWidgetData {
+  visualization: EventVisualization;
+  series: EventsSeriesValue[];
+  metric: WidgetMetric;
+}
+
+export interface EventsTimeseriesWidgetData {
+  visualization: "line" | "timeseries" | "activity";
+  step?: string;
+  metric: WidgetMetric;
+  series: EventsSeriesPoint[];
+}
+
+export type EventsWidgetData =
+  | EventsKpiWidgetData
+  | EventsTimeseriesWidgetData;
+
+export type WidgetData = FunnelWidgetData | EventsWidgetData;
 
 export async function fetchWidgets(applicationId: number): Promise<Widget[]> {
   const res = await apiFetch(
@@ -185,7 +216,11 @@ export async function moveWidgetInList(
 }
 
 export async function fetchWidgetData(id: number): Promise<WidgetData | null> {
-  const res = await apiFetch(`/widgets/${id}/data`, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await apiFetch(`/widgets/${id}/data`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }

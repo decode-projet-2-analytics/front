@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 import { updateWidget, type Widget } from "@/lib/dashboardApi";
 
@@ -18,9 +19,14 @@ export default function EditWidgetTitleModal({
   onUpdated,
 }: Props) {
   const t = useTranslations("Dashboard");
+  const [mounted, setMounted] = useState(false);
   const [title, setTitle] = useState(widget.title);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -29,7 +35,7 @@ export default function EditWidgetTitleModal({
     }
   }, [open, widget.title]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -54,9 +60,9 @@ export default function EditWidgetTitleModal({
     });
   }
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+      className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-4"
       onClick={onClose}
       role="presentation"
     >
@@ -107,6 +113,7 @@ export default function EditWidgetTitleModal({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

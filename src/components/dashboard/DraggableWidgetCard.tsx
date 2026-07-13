@@ -10,6 +10,7 @@ interface Props {
   widget: Widget;
   refreshKey: number;
   reordering?: boolean;
+  liveData?: unknown;
   onDeleted: () => void;
   onUpdated: () => void;
 }
@@ -18,6 +19,7 @@ export default function DraggableWidgetCard({
   widget,
   refreshKey,
   reordering = false,
+  liveData = null,
   onDeleted,
   onUpdated,
 }: Props) {
@@ -38,6 +40,7 @@ export default function DraggableWidgetCard({
           widget={widget}
           refreshKey={refreshKey}
           reordering={reordering}
+          liveData={liveData}
           dragHandleProps={{ ...attributes, ...listeners }}
           onDeleted={onDeleted}
           onUpdated={onUpdated}

@@ -2,15 +2,19 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { createWidget, type WidgetType } from "@/lib/dashboardApi";
+import { createWidget, type Widget, type WidgetType } from "@/lib/dashboardApi";
 
-const WIDGET_TYPES: WidgetType[] = ["kpi", "timeseries", "heatmap", "mouse_heatmap"];
+const WIDGET_TYPES: WidgetType[] = [
+  "events",
+  "funnel",
+  "mouse_heatmap",
+];
 
 interface Props {
   open: boolean;
   applicationId: number;
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: (widget: Widget) => void;
 }
 
 export default function AddWidgetModal({
@@ -20,14 +24,14 @@ export default function AddWidgetModal({
   onCreated,
 }: Props) {
   const t = useTranslations("Dashboard");
-  const [type, setType] = useState<WidgetType>("kpi");
+  const [type, setType] = useState<WidgetType>("events");
   const [title, setTitle] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     if (open) {
-      setType("kpi");
+      setType("events");
       setTitle("");
       setError(null);
     }
@@ -43,10 +47,40 @@ export default function AddWidgetModal({
     if (!trimmedTitle) return;
 
     startTransition(async () => {
+      const baseConfig = {
+        filters: {},
+        timeRange: { from: null, to: null, step: "1h" as const },
+        metric: "count" as const,
+      };
+
+      const config =
+        type === "events"
+          ? {
+              ...baseConfig,
+              tagId: undefined,
+              visualization: "nombre" as const,
+              series: [{ name: "All", filters: [] }],
+              layout: { x: 0, y: 0, w: 4, h: 4 },
+            }
+          : type === "funnel"
+            ? {
+                ...baseConfig,
+                tunnelId: undefined,
+                layout: { x: 0, y: 0, w: 12, h: 5 },
+              }
+            : type === "mouse_heatmap"
+              ? {
+                  ...baseConfig,
+                  mouse: { period: "7d" as const, page: null },
+                  layout: { x: 0, y: 0, w: 12, h: 6 },
+                }
+              : baseConfig;
+
       const widget = await createWidget({
         type,
         title: trimmedTitle,
         applicationId,
+        config,
       });
 
       if (!widget) {
@@ -54,7 +88,7 @@ export default function AddWidgetModal({
         return;
       }
 
-      onCreated();
+      onCreated(widget);
       onClose();
     });
   }

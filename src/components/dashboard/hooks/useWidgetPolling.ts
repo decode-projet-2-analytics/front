@@ -8,6 +8,8 @@ export function useWidgetPolling(intervalMs = DEFAULT_INTERVAL_MS) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
+    if (intervalMs <= 0) return;
+
     const id = window.setInterval(() => {
       setTick((value) => value + 1);
     }, intervalMs);

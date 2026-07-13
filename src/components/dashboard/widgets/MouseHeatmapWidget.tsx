@@ -1,18 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import type { Widget } from "@/lib/dashboardApi";
+import { updateWidget, type Widget } from "@/lib/dashboardApi";
 import {
   fetchMouseMovements,
   fetchPageSnapshot,
   fetchTrackedPages,
   type DocSize,
   type HeatmapPeriod,
+  type MouseMovements,
   type MousePoint,
   type PageSnapshotData,
   type TrackedPage,
 } from "@/lib/mouseHeatmapApi";
+import {
+  buildMouseConfig,
+  readMousePage,
+  readMousePeriod,
+  type MousePeriod,
+} from "../builder/widgetConfigUtils";
 
 const PERIODS: HeatmapPeriod[] = ["today", "7d", "30d"];
 
@@ -28,9 +35,20 @@ const BUCKET_SIZE = 12; // pixels, in source (logical) space
 // Max opacity (0-255) of the heat layer over the page screenshot.
 const MAX_ALPHA = 180;
 
+/** Live push payload for a `mouse_heatmap` widget (see backend push.js). */
+export interface MouseHeatmapLiveData {
+  period: HeatmapPeriod;
+  page: string | null;
+  pages?: TrackedPage[];
+  movements?: MouseMovements | null;
+  snapshot?: PageSnapshotData | null;
+}
+
 interface Props {
   widget: Widget;
   refreshKey?: number;
+  liveData?: MouseHeatmapLiveData | null;
+  onConfigPatched?: () => void;
 }
 
 interface Bucketed {
@@ -156,22 +174,65 @@ function drawHeatmap(canvas: HTMLCanvasElement, bucket: Bucketed): void {
   ctx.putImageData(image, 0, 0);
 }
 
-export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
+export default function MouseHeatmapWidget({
+  widget,
+  refreshKey = 0,
+  liveData = null,
+  onConfigPatched,
+}: Props) {
   const t = useTranslations("Dashboard");
   const applicationId = widget.applicationId;
+  const [, startPatchTransition] = useTransition();
 
-  const [period, setPeriod] = useState<HeatmapPeriod>("7d");
+  const [period, setPeriod] = useState<HeatmapPeriod>(() =>
+    readMousePeriod(widget.config)
+  );
   const [pages, setPages] = useState<TrackedPage[]>([]);
-  const [selectedPage, setSelectedPage] = useState<string | null>(null);
+  const [selectedPage, setSelectedPage] = useState<string | null>(() =>
+    readMousePage(widget.config)
+  );
   const [bucket, setBucket] = useState<Bucketed | null>(null);
   const [snapshot, setSnapshot] = useState<PageSnapshotData | null>(null);
   const [pointCount, setPointCount] = useState(0);
+  const [truncated, setTruncated] = useState(false);
 
   const [loadingPages, setLoadingPages] = useState(true);
   const [loadingPoints, setLoadingPoints] = useState(false);
   const [error, setError] = useState(false);
+  const [patchError, setPatchError] = useState<string | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    setPeriod(readMousePeriod(widget.config));
+    setSelectedPage(readMousePage(widget.config));
+    setPatchError(null);
+  }, [widget.config.mouse?.period, widget.config.mouse?.page, widget.id]);
+
+  function patchConfig(nextPeriod: MousePeriod, nextPage: string | null) {
+    startPatchTransition(async () => {
+      setPatchError(null);
+      const config = buildMouseConfig(widget.config, nextPeriod, nextPage);
+      const updated = await updateWidget(widget.id, { config });
+      if (updated) {
+        onConfigPatched?.();
+      } else {
+        setPeriod(readMousePeriod(widget.config));
+        setSelectedPage(readMousePage(widget.config));
+        setPatchError(t("updateError"));
+      }
+    });
+  }
+
+  function handlePeriodChange(nextPeriod: HeatmapPeriod) {
+    setPeriod(nextPeriod);
+    patchConfig(nextPeriod, selectedPage);
+  }
+
+  function handlePageChange(nextPage: string | null) {
+    setSelectedPage(nextPage);
+    patchConfig(period, nextPage);
+  }
 
   // 1) Load the list of tracked pages for the current app + period.
   useEffect(() => {
@@ -182,17 +243,27 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
     fetchTrackedPages(applicationId, period).then((result) => {
       if (cancelled) return;
       setPages(result);
-      // Keep the current page if it still exists, else pick the busiest one.
+
+      const persistedPage = readMousePage(widget.config);
+
       setSelectedPage((current) => {
-        if (current && result.some((p) => p.page === current)) return current;
+        if (current && result.some((p) => p.page === current)) {
+          return current;
+        }
+        if (persistedPage && result.some((p) => p.page === persistedPage)) {
+          return persistedPage;
+        }
         return result[0]?.page ?? null;
       });
+
       setLoadingPages(false);
     });
 
     return () => {
       cancelled = true;
     };
+    // Intentionally omit widget.config: auto-select must not patch+refresh in a loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- persist only via user actions
   }, [applicationId, period, refreshKey]);
 
   // 2) Load the movements for the selected page and bucket them for drawing.
@@ -218,8 +289,10 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
         setError(true);
         setBucket(null);
         setPointCount(0);
+        setTruncated(false);
       } else {
         setPointCount(movements.count);
+        setTruncated(movements.truncated);
         setBucket(
           movements.points.length > 0
             ? bucketPoints(movements.points, movements.docSize)
@@ -235,6 +308,40 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
       cancelled = true;
     };
   }, [applicationId, selectedPage, period, refreshKey]);
+
+  // 2b) Apply a live socket push directly (no refetch) when it matches the
+  // period/page currently shown; stale payloads (e.g. from before a config
+  // patch was applied) are ignored.
+  useEffect(() => {
+    if (!liveData) return;
+    if (liveData.period !== period || liveData.page !== selectedPage) return;
+
+    if (Array.isArray(liveData.pages)) {
+      setPages(liveData.pages);
+    }
+
+    if (liveData.movements) {
+      setPointCount(liveData.movements.count);
+      setTruncated(liveData.movements.truncated);
+      setBucket(
+        liveData.movements.points.length > 0
+          ? bucketPoints(liveData.movements.points, liveData.movements.docSize)
+          : null
+      );
+      setError(false);
+    } else if (liveData.movements === null) {
+      setBucket(null);
+      setPointCount(0);
+      setTruncated(false);
+    }
+
+    if (liveData.snapshot) {
+      setSnapshot(liveData.snapshot);
+    }
+
+    setLoadingPages(false);
+    setLoadingPoints(false);
+  }, [liveData, period, selectedPage]);
 
   // 3) Draw (and re-draw on resize) the heatmap from the bucketed data.
   useEffect(() => {
@@ -254,19 +361,19 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
 
   return (
     <div
-      className={`flex w-full flex-col gap-3 rounded-lg border border-border-subtle bg-surface-1 p-3 transition-opacity ${
+      className={`flex h-full min-h-0 w-full flex-col gap-3 rounded-lg border border-border-subtle bg-surface-1 p-3 transition-opacity ${
         loadingPoints ? "opacity-70" : ""
       }`}
     >
       {/* Controls: page selector + period toggle */}
-      <div className="flex flex-wrap items-end justify-between gap-3">
+      <div className="flex shrink-0 flex-wrap items-end justify-between gap-3">
         <label className="flex min-w-0 flex-1 flex-col gap-1.5">
           <span className="text-sm font-medium text-foreground-muted">
             {t("mouseHeatmapPageLabel")}
           </span>
           <select
             value={selectedPage ?? ""}
-            onChange={(e) => setSelectedPage(e.target.value || null)}
+            onChange={(e) => handlePageChange(e.target.value || null)}
             disabled={pages.length === 0}
             className="w-full rounded-lg border border-border bg-surface-0 px-3 py-2 text-sm outline-none focus:border-white focus:outline-none focus:ring-0 disabled:opacity-50"
           >
@@ -288,7 +395,7 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
             <button
               key={preset}
               type="button"
-              onClick={() => setPeriod(preset)}
+              onClick={() => handlePeriodChange(preset)}
               className={`rounded-md px-2.5 py-1 text-xs transition-colors ${
                 period === preset
                   ? "bg-primary text-white"
@@ -300,6 +407,8 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
           ))}
         </div>
       </div>
+
+      {patchError && <p className="text-xs text-error">{patchError}</p>}
 
       {/* Heatmap surface / states */}
       {showInitialSkeleton ? (
@@ -318,7 +427,7 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
         </div>
       ) : (
         <div
-          className="relative w-full overflow-hidden rounded-md border border-border-subtle bg-surface-0"
+          className="relative min-h-0 w-full flex-1 overflow-hidden rounded-md border border-border-subtle bg-surface-0"
           style={{
             aspectRatio: snapshot
               ? `${snapshot.width} / ${snapshot.height}`
@@ -342,9 +451,14 @@ export default function MouseHeatmapWidget({ widget, refreshKey = 0 }: Props) {
       )}
 
       {/* Caption */}
-      <div className="flex items-center justify-between text-[10px] text-foreground-muted">
-        <span>{t("mouseHeatmapPoints", { count: pointCount })}</span>
-        <span>{t("mouseHeatmapCaption")}</span>
+      <div className="flex shrink-0 flex-col gap-1">
+        {truncated && (
+          <p className="text-xs text-warning">{t("mouseTruncated")}</p>
+        )}
+        <div className="flex items-center justify-between text-[10px] text-foreground-muted">
+          <span>{t("mouseHeatmapPoints", { count: pointCount })}</span>
+          <span>{t("mouseHeatmapCaption")}</span>
+        </div>
       </div>
     </div>
   );

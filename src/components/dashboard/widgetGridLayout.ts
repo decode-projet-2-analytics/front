@@ -3,12 +3,37 @@ import type { Widget } from "@/lib/dashboardApi";
 export const WIDGETS_PER_ROW = 3;
 
 export function isFullWidthWidget(widget: Widget): boolean {
-  return widget.type === "heatmap" || widget.type === "mouse_heatmap";
+  return widget.type === "mouse_heatmap" || widget.type === "funnel";
 }
 
 export function sortWidgets(widgets: Widget[]): Widget[] {
   return [...widgets].sort(
     (a, b) => a.position - b.position || a.id - b.id
+  );
+}
+
+export const SECTION_ORDER = ["events", "funnel", "heatmap"] as const;
+export type SectionKey = (typeof SECTION_ORDER)[number];
+
+export function sectionKeyForWidget(widget: Widget): SectionKey {
+  if (widget.type === "mouse_heatmap") return "heatmap";
+  if (widget.type === "funnel") return "funnel";
+  return "events";
+}
+
+export function groupWidgetsBySection(
+  widgets: Widget[]
+): { key: SectionKey; widgets: Widget[] }[] {
+  const sorted = sortWidgets(widgets);
+  return SECTION_ORDER.map((key) => ({
+    key,
+    widgets: sorted.filter((w) => sectionKeyForWidget(w) === key),
+  })).filter((section) => section.widgets.length > 0);
+}
+
+export function packWidgetRowsBySection(widgets: Widget[]): Widget[][] {
+  return groupWidgetsBySection(widgets).flatMap((section) =>
+    packWidgetRows(section.widgets)
   );
 }
 
@@ -115,7 +140,7 @@ export function insertWidgetAtRowGap(
   if (!widget) return widgets;
 
   const withoutWidget = widgets.filter((item) => item.id !== widgetId);
-  const rows = packWidgetRows(withoutWidget);
+  const rows = packWidgetRowsBySection(withoutWidget);
   const insertAt = getFlatIndexForRowGap(rows, gapIndex);
 
   const next = [...withoutWidget];
@@ -147,7 +172,7 @@ export function reorderWidgets(
     return swapAdjacent(sorted, index, targetIndex);
   }
 
-  const rows = packWidgetRows(sorted);
+  const rows = packWidgetRowsBySection(sorted);
   const rowIndex = rows.findIndex((row) =>
     row.some((item) => item.id === widgetId)
   );
@@ -163,11 +188,11 @@ export function reorderWidgets(
       return swapAdjacent(sorted, index, targetIndex);
     }
 
-    const withoutHeatmap = sorted.filter((item) => item.id !== widgetId);
+    const withoutFullWidth = sorted.filter((item) => item.id !== widgetId);
     const anchorId = nextRow[nextRow.length - 1].id;
-    const insertIndex = withoutHeatmap.findIndex((item) => item.id === anchorId) + 1;
-    withoutHeatmap.splice(insertIndex, 0, widget);
-    return withoutHeatmap;
+    const insertIndex = withoutFullWidth.findIndex((item) => item.id === anchorId) + 1;
+    withoutFullWidth.splice(insertIndex, 0, widget);
+    return withoutFullWidth;
   }
 
   if (rowIndex <= 0) return null;
@@ -178,9 +203,9 @@ export function reorderWidgets(
     return swapAdjacent(sorted, index, targetIndex);
   }
 
-  const withoutHeatmap = sorted.filter((item) => item.id !== widgetId);
+  const withoutFullWidth = sorted.filter((item) => item.id !== widgetId);
   const anchorId = previousRow[0].id;
-  const insertIndex = withoutHeatmap.findIndex((item) => item.id === anchorId);
-  withoutHeatmap.splice(insertIndex, 0, widget);
-  return withoutHeatmap;
+  const insertIndex = withoutFullWidth.findIndex((item) => item.id === anchorId);
+  withoutFullWidth.splice(insertIndex, 0, widget);
+  return withoutFullWidth;
 }
