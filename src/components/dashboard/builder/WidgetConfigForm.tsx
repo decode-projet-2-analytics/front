@@ -18,6 +18,7 @@ import {
   EVENT_VISUALIZATIONS,
   EVENT_METRICS,
   MOUSE_PERIODS,
+  BREAKDOWN_DIMENSIONS,
   PERIOD_PRESETS,
   TIME_STEPS,
   buildEventsConfig,
@@ -29,11 +30,14 @@ import {
   readEventVisualization,
   readEventType,
   readEventsTagId,
+  readGroupBy,
   readMousePage,
   readMousePeriod,
   readTagId,
   readTunnelId,
+  readBreakdownMetric,
   normalizeWidgetMetric,
+  type BreakdownDimension,
   type MousePeriod,
   type PeriodPreset,
   type TimeStep,
@@ -78,6 +82,8 @@ export default function WidgetConfigForm({
   const isFunnel = widget.type === "funnel";
   const isMouse = widget.type === "mouse_heatmap";
   const isEvents = widget.type === "events";
+  const isBreakdown = widget.type === "breakdown";
+  const isScrollDepth = widget.type === "scroll_depth";
   const [period, setPeriod] = useState<PeriodPreset>(() =>
     inferPeriod(widget.config?.timeRange)
   );
@@ -85,9 +91,12 @@ export default function WidgetConfigForm({
   const [step, setStep] = useState<TimeStep>(
     (widget.config?.timeRange?.step as TimeStep) || "1h"
   );
-  const [metric, setMetric] = useState<WidgetMetric>(() =>
-    normalizeWidgetMetric(widget.config?.metric)
-  );
+  const [metric, setMetric] = useState<WidgetMetric>(() => {
+    if (widget.type === "breakdown") {
+      return readBreakdownMetric(widget.config?.metric);
+    }
+    return normalizeWidgetMetric(widget.config?.metric);
+  });
   const [eventType, setEventType] = useState(() =>
     readEventType(widget.config?.filters)
   );
@@ -112,6 +121,9 @@ export default function WidgetConfigForm({
     const page = readMousePage(widget.config);
     return page ?? "";
   });
+  const [groupBy, setGroupBy] = useState<BreakdownDimension>(() =>
+    readGroupBy(widget.config?.filters ?? {})
+  );
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -121,7 +133,11 @@ export default function WidgetConfigForm({
     setTitle(widget.title);
     setPeriod(inferPeriod(widget.config?.timeRange));
     setStep((widget.config?.timeRange?.step as TimeStep) || "1h");
-    setMetric(normalizeWidgetMetric(widget.config?.metric));
+    setMetric(
+      widget.type === "breakdown"
+        ? readBreakdownMetric(widget.config?.metric)
+        : normalizeWidgetMetric(widget.config?.metric)
+    );
     setEventType(readEventType(widget.config?.filters));
     setEventVisualization(readEventVisualization(widget.config));
     setEventTagId(readEventsTagId(widget.config));
@@ -130,6 +146,7 @@ export default function WidgetConfigForm({
     setTunnelId(readTunnelId(widget.config));
     setMousePeriod(readMousePeriod(widget.config));
     setMousePage(readMousePage(widget.config) ?? "");
+    setGroupBy(readGroupBy(widget.config?.filters ?? {}));
     setError(null);
   }, [widget.id]);
 
@@ -185,6 +202,26 @@ export default function WidgetConfigForm({
     } else if (isFunnel) {
       if (tunnelId === "") return;
       config = buildFunnelConfig(widget.config, period, tunnelId);
+    } else if (isBreakdown) {
+      config = buildWidgetConfig(
+        widget.config,
+        period,
+        step,
+        metric,
+        "",
+        null,
+        groupBy
+      );
+    } else if (isScrollDepth) {
+      config = buildWidgetConfig(
+        widget.config,
+        period,
+        step,
+        "count",
+        "",
+        null,
+        null
+      );
     } else {
       config = buildWidgetConfig(
         widget.config,
@@ -434,85 +471,118 @@ export default function WidgetConfigForm({
                 ))}
               </select>
             </label>
-          ) : (
+          ) : isScrollDepth ? null : (
             <>
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-foreground-muted">
-                  {t("stepLabel")}
-                </span>
-                <select
-                  value={step}
-                  onChange={(e) => setStep(e.target.value as TimeStep)}
-                  className={fieldClass}
-                >
-                  {TIME_STEPS.map((timeStep) => (
-                    <option key={timeStep} value={timeStep}>
-                      {t(`step_${timeStep}`)}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              {isBreakdown && (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium text-foreground-muted">
+                    {t("breakdownGroupByLabel")}
+                  </span>
+                  <select
+                    value={groupBy}
+                    onChange={(e) =>
+                      setGroupBy(e.target.value as BreakdownDimension)
+                    }
+                    className={fieldClass}
+                  >
+                    {BREAKDOWN_DIMENSIONS.map((dimension) => (
+                      <option key={dimension} value={dimension}>
+                        {t(`groupBy_${dimension}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
 
-              <fieldset className="flex flex-col gap-2">
-                <legend className="text-sm font-medium text-foreground-muted">
-                  {t("metricLabel")}
-                </legend>
-                <div className="grid grid-cols-2 gap-2">
-                  {(["count", "rate"] as WidgetMetric[]).map((value) => (
-                    <label
-                      key={value}
-                      className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm transition-colors ${
-                        metric === value
-                          ? "border-primary bg-primary-muted text-primary"
-                          : "border-border-subtle hover:border-border"
-                      }`}
+              {!isScrollDepth && (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium text-foreground-muted">
+                    {t("stepLabel")}
+                  </span>
+                  <select
+                    value={step}
+                    onChange={(e) => setStep(e.target.value as TimeStep)}
+                    className={fieldClass}
+                  >
+                    {TIME_STEPS.map((timeStep) => (
+                      <option key={timeStep} value={timeStep}>
+                        {t(`step_${timeStep}`)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {!isScrollDepth && (
+                <fieldset className="flex flex-col gap-2">
+                  <legend className="text-sm font-medium text-foreground-muted">
+                    {t("metricLabel")}
+                  </legend>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(["count", "rate"] as WidgetMetric[]).map((value) => (
+                      <label
+                        key={value}
+                        className={`cursor-pointer rounded-lg border px-3 py-2 text-center text-sm transition-colors ${
+                          metric === value
+                            ? "border-primary bg-primary-muted text-primary"
+                            : "border-border-subtle hover:border-border"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="metric"
+                          value={value}
+                          checked={metric === value}
+                          onChange={() => setMetric(value)}
+                          className="sr-only"
+                        />
+                        {t(`metric_${value}`)}
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
+
+              {!isBreakdown && !isScrollDepth && (
+                <>
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-foreground-muted">
+                      {t("filterTypeLabel")}
+                    </span>
+                    <input
+                      type="text"
+                      value={eventType}
+                      onChange={(e) => setEventType(e.target.value)}
+                      placeholder={t("filterTypePlaceholder")}
+                      className={fieldClass}
+                    />
+                  </label>
+
+                  <label className="flex flex-col gap-1.5">
+                    <span className="text-sm font-medium text-foreground-muted">
+                      {t("filterTagLabel")}
+                    </span>
+                    <select
+                      value={tagId}
+                      onChange={(e) =>
+                        setTagId(
+                          e.target.value === "" ? "" : Number(e.target.value)
+                        )
+                      }
+                      className={fieldClass}
                     >
-                      <input
-                        type="radio"
-                        name="metric"
-                        value={value}
-                        checked={metric === value}
-                        onChange={() => setMetric(value)}
-                        className="sr-only"
-                      />
-                      {t(`metric_${value}`)}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-foreground-muted">
-                  {t("filterTypeLabel")}
-                </span>
-                <input
-                  type="text"
-                  value={eventType}
-                  onChange={(e) => setEventType(e.target.value)}
-                  placeholder={t("filterTypePlaceholder")}
-                  className={fieldClass}
-                />
-              </label>
-
-              <label className="flex flex-col gap-1.5">
-                <span className="text-sm font-medium text-foreground-muted">
-                  {t("filterTagLabel")}
-                </span>
-                <select
-                  value={tagId}
-                  onChange={(e) =>
-                    setTagId(e.target.value === "" ? "" : Number(e.target.value))
-                  }
-                  className={fieldClass}
-                >
-                  <option value="">{t("filterTagAll")}</option>
-                  {tags.map((tag) => (
-                    <option key={tag.id} value={tag.id}>
-                      {tag.comment ? `${tag.slug} — ${tag.comment}` : tag.slug}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                      <option value="">{t("filterTagAll")}</option>
+                      {tags.map((tag) => (
+                        <option key={tag.id} value={tag.id}>
+                          {tag.comment
+                            ? `${tag.slug} — ${tag.comment}`
+                            : tag.slug}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              )}
             </>
           )}
         </>

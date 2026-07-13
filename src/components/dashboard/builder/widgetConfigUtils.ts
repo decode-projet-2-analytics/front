@@ -21,6 +21,9 @@ export const EVENT_VISUALIZATIONS: EventVisualization[] = [
 ];
 export const EVENT_METRICS: WidgetMetric[] = ["count", "sessions"];
 
+export type BreakdownDimension = "url" | "referrer";
+export const BREAKDOWN_DIMENSIONS: BreakdownDimension[] = ["url", "referrer"];
+
 const LEGACY_VISUALIZATION_MAP: Record<string, EventVisualization> = {
   kpi: "nombre",
   comparison: "bar",
@@ -46,6 +49,12 @@ export function normalizeWidgetMetric(
 ): "count" | "sessions" {
   if (metric === "sessions") return "sessions";
   return "count";
+}
+
+export function readBreakdownMetric(
+  metric?: string | null
+): "count" | "rate" {
+  return metric === "rate" ? "rate" : "count";
 }
 
 const PERIOD_MS: Record<PeriodPreset, number> = {
@@ -116,13 +125,20 @@ export function readTagId(
   return Number.isNaN(id) ? null : id;
 }
 
+export function readGroupBy(
+  filters: Record<string, unknown>
+): BreakdownDimension {
+  return filters.groupBy === "referrer" ? "referrer" : "url";
+}
+
 export function buildWidgetConfig(
   current: WidgetConfig,
   period: PeriodPreset,
   step: TimeStep,
   metric: WidgetConfig["metric"],
   eventType: string,
-  tagId: number | null
+  tagId: number | null,
+  groupBy?: BreakdownDimension | null
 ): WidgetConfig {
   const filters: Record<string, unknown> = {};
 
@@ -132,6 +148,10 @@ export function buildWidgetConfig(
 
   if (tagId != null) {
     filters.tagId = tagId;
+  }
+
+  if (groupBy) {
+    filters.groupBy = groupBy;
   }
 
   return {

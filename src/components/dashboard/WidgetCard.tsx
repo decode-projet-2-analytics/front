@@ -6,8 +6,10 @@ import type { DraggableAttributes } from "@dnd-kit/core";
 import {
   deleteWidget,
   fetchTags,
+  type BreakdownWidgetData,
   type EventsWidgetData,
   type FunnelWidgetData,
+  type ScrollDepthWidgetData,
   type Tag,
   type Widget,
 } from "@/lib/dashboardApi";
@@ -19,6 +21,8 @@ import type { MouseHeatmapLiveData } from "./widgets/MouseHeatmapWidget";
 import MouseHeatmapWidget from "./widgets/MouseHeatmapWidget";
 import FunnelWidget from "./widgets/FunnelWidget";
 import EventsWidget from "./widgets/EventsWidget";
+import BreakdownWidget from "./widgets/BreakdownWidget";
+import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 
 interface Props {
@@ -67,6 +71,22 @@ function WidgetContent({
           widget={widget}
           refreshKey={refreshKey}
           liveData={liveData as FunnelWidgetData | null}
+        />
+      );
+    case "breakdown":
+      return (
+        <BreakdownWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as BreakdownWidgetData | null}
+        />
+      );
+    case "scroll_depth":
+      return (
+        <ScrollDepthWidget
+          widget={widget}
+          refreshKey={refreshKey}
+          liveData={liveData as ScrollDepthWidgetData | null}
         />
       );
   }
@@ -140,6 +160,12 @@ export default function WidgetCard({
     });
   }
 
+  const showTypeBadge =
+    widget.type === "funnel" ||
+    widget.type === "mouse_heatmap" ||
+    widget.type === "breakdown" ||
+    widget.type === "scroll_depth";
+
   return (
     <>
       <article
@@ -190,13 +216,11 @@ export default function WidgetCard({
                     {tag.slug}
                   </span>
                 )}
-                {!isEvents &&
-                  (widget.type === "funnel" ||
-                    widget.type === "mouse_heatmap") && (
-                    <span className="truncate text-xs text-foreground-muted">
-                      {t(`type_${widget.type}`)}
-                    </span>
-                  )}
+                {!isEvents && showTypeBadge && (
+                  <span className="truncate text-xs text-foreground-muted">
+                    {t(`type_${widget.type}`)}
+                  </span>
+                )}
               </div>
               {isEvents && tag?.comment ? (
                 <p className="mt-0.5 truncate text-xs text-foreground-secondary">
