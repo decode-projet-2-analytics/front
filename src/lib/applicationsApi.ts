@@ -111,6 +111,13 @@ export async function updateApplication(
   return res.json();
 }
 
+export async function deleteApplication(id: number): Promise<boolean> {
+  const res = await apiFetch(`/applications/${id}`, {
+    method: "DELETE",
+  });
+  return res.ok;
+}
+
 export async function generateApplicationSecret(
   applicationId: number,
 ): Promise<{ appSecret: string } | null> {
