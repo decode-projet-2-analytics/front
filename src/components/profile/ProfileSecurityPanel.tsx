@@ -3,7 +3,7 @@
 import { FormEvent, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { clearSession } from "@/lib/auth";
+import { logoutAction } from "@/lib/session";
 import { updateMe } from "@/lib/userApi";
 
 export default function ProfileSecurityPanel() {
@@ -43,10 +43,9 @@ export default function ProfileSecurityPanel() {
     startTransition(() => router.refresh());
   }
 
-  function handleLogout() {
-    clearSession();
+  async function handleLogout() {
+    await logoutAction();
     router.replace("/");
-    router.refresh();
   }
 
   return (

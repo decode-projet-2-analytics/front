@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import Logo from "./Logo";
-import { clearSession } from "@/lib/auth";
+import { logoutAction } from "@/lib/session";
 import type { CurrentUser } from "@/lib/userApi";
 
 interface Props {
@@ -14,10 +14,9 @@ export default function LandingHeader({ user }: Props) {
   const t = useTranslations("Landing");
   const router = useRouter();
 
-  function handleLogout() {
-    clearSession();
+  async function handleLogout() {
+    await logoutAction();
     router.replace("/");
-    router.refresh();
   }
 
   return (

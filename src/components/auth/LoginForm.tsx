@@ -3,9 +3,7 @@
 import { FormEvent, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { setToken, setRefreshToken, clearSession } from "@/lib/auth";
-import { apiFetchClient } from "@/lib/api";
-import { fetchMe } from "@/lib/userApi";
+import { loginAction } from "@/lib/session";
 
 interface Props {
   redirectTo?: string;
@@ -22,66 +20,27 @@ export default function LoginForm({ redirectTo = "/dashboard" }: Props) {
     setError("");
 
     const formData = new FormData(event.currentTarget);
+    const result = await loginAction(
+      String(formData.get("email") ?? ""),
+      String(formData.get("password") ?? ""),
+      redirectTo,
+    );
 
-    const response = await apiFetchClient("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({
-        email: formData.get("email"),
-        password: formData.get("password"),
-      }),
-    });
-
-    if (response.status === 403) {
-      const body = response.body as { error?: { message?: string } };
-      const message: string = body?.error?.message ?? "";
-      if (message.toLowerCase().includes("attente")) {
-        router.replace("/pending");
-      } else {
-        setError(t("errorRejected"));
+    if (!result.ok) {
+      if (result.error === "pending") {
+        startTransition(() => {
+          router.replace("/pending");
+        });
+        return;
       }
+      setError(
+        result.error === "rejected" ? t("errorRejected") : t("error"),
+      );
       return;
     }
-
-    if (!response.ok) {
-      setError(t("error"));
-      return;
-    }
-
-    const data = response.body as {
-      token?: string;
-      accessToken?: string;
-      refreshToken?: string;
-    };
-    const accessToken = data.accessToken ?? data.token;
-    if (!accessToken) {
-      setError(t("error"));
-      return;
-    }
-
-    setToken(accessToken);
-    if (data.refreshToken) setRefreshToken(data.refreshToken);
-
-    try {
-      const me = await fetchMe();
-      if (me) {
-        if (me.status === "pending") {
-          startTransition(() => {
-            router.replace("/pending");
-            router.refresh();
-          });
-          return;
-        }
-        if (me.status === "rejected") {
-          setError(t("errorRejected"));
-          clearSession();
-          return;
-        }
-      }
-    } catch {}
 
     startTransition(() => {
-      router.replace(redirectTo);
-      router.refresh();
+      router.replace(result.redirectTo);
     });
   }
 

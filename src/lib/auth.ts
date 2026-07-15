@@ -70,6 +70,20 @@ export async function setAccessTokenServer(token: string): Promise<boolean> {
   }
 }
 
+/** Persist a new refresh token from a Server Action. */
+export async function setRefreshTokenServer(token: string): Promise<boolean> {
+  try {
+    const { cookies } = await import("next/headers");
+    (await cookies()).set(REFRESH_TOKEN_COOKIE, token, {
+      path: "/",
+      sameSite: "lax",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // --- Impersonate ---
 
 export const getAdminToken = () => getCookie(ADMIN_TOKEN_COOKIE);
