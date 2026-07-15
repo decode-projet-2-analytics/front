@@ -8,7 +8,18 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 import { useSocket } from "@/hooks/useSocket";
+import { useRouter } from "@/i18n/navigation";
+import {
+  getCallNotificationPresentation,
+  getMessageNotificationPresentation,
+  shouldShowAdminSupportNotifications,
+  type AdminCallNotification,
+  type AdminMessageNotification,
+  type AdminNotificationPresentation,
+} from "@/lib/adminNotificationPresentation.mjs";
 
 const NOTIFICATIONS_NAMESPACE = "/notifications";
 
@@ -16,6 +27,8 @@ const EVENTS = {
   AVAILABILITY_ADMIN: "availability:admin",
   AVAILABILITY_USER: "availability:user",
   AVAILABILITY_USERS: "availability:users",
+  ADMIN_MESSAGE: "notification:message",
+  ADMIN_CALL: "notification:call",
 } as const;
 
 interface NotificationsContextValue {
@@ -37,6 +50,8 @@ interface Props {
 
 export function NotificationsProvider({ userRole, children }: Props) {
   const { socket } = useSocket(NOTIFICATIONS_NAMESPACE);
+  const router = useRouter();
+  const t = useTranslations("Support.notifications");
   const [adminAvailable, setAdminAvailable] = useState(false);
   const [onlineUserIds, setOnlineUserIds] = useState<Set<number>>(new Set());
 
@@ -71,22 +86,50 @@ export function NotificationsProvider({ userRole, children }: Props) {
       });
     }
 
-    if (userRole === "Webmaster") {
+    function showAdminNotification(
+      presentation: AdminNotificationPresentation,
+    ) {
+      toast(presentation.title, {
+        id: presentation.id,
+        description: presentation.description,
+        action: {
+          label: presentation.actionLabel,
+          onClick: () => router.push(presentation.href),
+        },
+      });
+    }
+
+    function onAdminMessage(payload: AdminMessageNotification) {
+      showAdminNotification(getMessageNotificationPresentation(payload, t));
+    }
+
+    function onAdminCall(payload: AdminCallNotification) {
+      showAdminNotification(getCallNotificationPresentation(payload, t));
+    }
+
+    const showAdminNotifications =
+      shouldShowAdminSupportNotifications(userRole);
+
+    if (!showAdminNotifications) {
       socket.on(EVENTS.AVAILABILITY_ADMIN, onAdminAvailability);
     } else {
       socket.on(EVENTS.AVAILABILITY_USERS, onUsersSnapshot);
       socket.on(EVENTS.AVAILABILITY_USER, onUserAvailability);
+      socket.on(EVENTS.ADMIN_MESSAGE, onAdminMessage);
+      socket.on(EVENTS.ADMIN_CALL, onAdminCall);
     }
 
     return () => {
-      if (userRole === "Webmaster") {
+      if (!showAdminNotifications) {
         socket.off(EVENTS.AVAILABILITY_ADMIN, onAdminAvailability);
       } else {
         socket.off(EVENTS.AVAILABILITY_USERS, onUsersSnapshot);
         socket.off(EVENTS.AVAILABILITY_USER, onUserAvailability);
+        socket.off(EVENTS.ADMIN_MESSAGE, onAdminMessage);
+        socket.off(EVENTS.ADMIN_CALL, onAdminCall);
       }
     };
-  }, [socket, userRole]);
+  }, [router, socket, t, userRole]);
 
   const value = useMemo(
     () => ({ userRole, adminAvailable, onlineUserIds }),

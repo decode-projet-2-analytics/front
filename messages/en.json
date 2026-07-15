@@ -314,6 +314,17 @@
     "subtitle": "Open a ticket and follow your support conversations.",
     "supportAvailable": "Support is online — you can open a ticket.",
     "supportUnavailable": "Support is offline — your tickets will be handled when an agent connects.",
+    "notifications": {
+      "newMessage": "New message",
+      "incomingCall": "Incoming call",
+      "unknownSender": "User",
+      "messageDescription": "{sender}: {preview}",
+      "callDescription": "{sender} is requesting a {media} call",
+      "audio": "audio",
+      "video": "video",
+      "audioVideo": "audio and video",
+      "open": "Open"
+    },
     "connection": {
       "hint": "Authenticated connection via JWT on the /notifications and /chat namespaces.",
       "status": "Status",

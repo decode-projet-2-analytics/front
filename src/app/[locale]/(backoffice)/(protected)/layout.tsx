@@ -3,6 +3,7 @@ import { redirect } from "@/i18n/navigation";
 import { getTokenServer } from "@/lib/auth";
 import { fetchMe } from "@/lib/userApi";
 import { NotificationsProvider } from "@/context/NotificationsProvider";
+import { Toaster } from "sonner";
 
 export default async function ProtectedLayout({
   children,
@@ -27,6 +28,7 @@ export default async function ProtectedLayout({
   return (
     <NotificationsProvider userRole={me!.role}>
       {children}
+      <Toaster position="top-right" richColors closeButton />
     </NotificationsProvider>
   );
 }

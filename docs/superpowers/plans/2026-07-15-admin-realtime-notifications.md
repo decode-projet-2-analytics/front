@@ -89,7 +89,7 @@ Expected: FAIL avec `ERR_MODULE_NOT_FOUND`.
 
 - [ ] **Step 3: Implémenter le mapping minimal**
 
-Les fonctions retournent l'identifiant reçu sans le régénérer, construisent `/${locale}/help/chat/${conversationId}` via un paramètre `locale`, et choisissent le libellé média depuis les booléens validés.
+Les fonctions retournent l'identifiant reçu sans le régénérer, construisent `/help/chat/${conversationId}` pour le routeur localisé `next-intl`, et choisissent le libellé média depuis les booléens validés.
 
 - [ ] **Step 4: Ajouter les traductions FR/EN**
 
