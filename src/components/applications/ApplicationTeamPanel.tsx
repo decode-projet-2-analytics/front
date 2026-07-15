@@ -23,7 +23,6 @@ interface Props {
 const editableRoles: Exclude<ApplicationTeamRole, "owner">[] = [
   "admin",
   "member",
-  "viewer",
 ];
 
 function displayName(member: ApplicationTeamMember) {

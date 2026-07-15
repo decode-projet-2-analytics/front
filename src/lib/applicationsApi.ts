@@ -14,7 +14,7 @@ export interface Application {
   updatedAt: string;
 }
 
-export type ApplicationTeamRole = "owner" | "admin" | "member" | "viewer";
+export type ApplicationTeamRole = "owner" | "admin" | "member";
 
 export interface ApplicationTeamUser {
   id: number;

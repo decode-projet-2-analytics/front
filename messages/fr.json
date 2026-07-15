@@ -229,8 +229,7 @@
       "roles": {
         "owner": "Propriétaire",
         "admin": "Administrateur",
-        "member": "Membre",
-        "viewer": "Lecteur"
+        "member": "Membre"
       },
       "accept": {
         "title": "Invitation à rejoindre une application",
