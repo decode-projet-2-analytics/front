@@ -140,7 +140,14 @@
         "saved": "Enregistré",
         "error": "Impossible d'enregistrer.",
         "createdAt": "Créée le",
-        "updatedAt": "Modifiée le"
+        "updatedAt": "Modifiée le",
+        "dangerTitle": "Zone de danger",
+        "dangerHint": "Supprime définitivement cette application et ses données associées. Cette action est irréversible.",
+        "deleteApplication": "Supprimer l'application",
+        "deleteConfirm": "Confirmer la suppression de cette application ?",
+        "deleteConfirmYes": "Confirmer",
+        "deleteError": "Impossible de supprimer l'application.",
+        "cancel": "Annuler"
       },
       "tunnels": {
         "title": "Tunnels de conversion",

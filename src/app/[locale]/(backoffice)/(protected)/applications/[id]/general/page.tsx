@@ -6,6 +6,7 @@ import {
 } from "@/lib/applicationsApi";
 import ApplicationSettingsForm from "@/components/applications/ApplicationSettingsForm";
 import ApplicationSecretActions from "@/components/applications/ApplicationSecretActions";
+import ApplicationDangerZone from "@/components/applications/ApplicationDangerZone";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -24,6 +25,7 @@ export default async function ApplicationGeneralPage({ params }: Props) {
   if (!application || !role) notFound();
 
   const canManageApplication = role === "owner" || role === "admin";
+  const isOwner = role === "owner";
 
   const createdAt = new Date(application.createdAt).toLocaleString();
   const updatedAt = new Date(application.updatedAt).toLocaleString();
@@ -79,6 +81,13 @@ export default async function ApplicationGeneralPage({ params }: Props) {
             applicationId={application.id}
             hasSecret={application.hasSecret}
           />
+        </section>
+      )}
+
+      {isOwner && (
+        <section className="rounded-lg border border-error/30 bg-surface-1 p-6 space-y-4">
+          <h2 className="text-sm font-medium text-error">{t("dangerTitle")}</h2>
+          <ApplicationDangerZone applicationId={application.id} />
         </section>
       )}
     </div>

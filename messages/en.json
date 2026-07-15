@@ -140,7 +140,14 @@
         "saved": "Saved",
         "error": "Could not save changes.",
         "createdAt": "Created",
-        "updatedAt": "Updated"
+        "updatedAt": "Updated",
+        "dangerTitle": "Danger zone",
+        "dangerHint": "Permanently delete this application and associated data. This cannot be undone.",
+        "deleteApplication": "Delete application",
+        "deleteConfirm": "Confirm deletion of this application?",
+        "deleteConfirmYes": "Confirm",
+        "deleteError": "Could not delete the application.",
+        "cancel": "Cancel"
       },
       "tunnels": {
         "title": "Conversion funnels",

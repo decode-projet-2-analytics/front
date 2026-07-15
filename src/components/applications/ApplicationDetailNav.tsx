@@ -30,7 +30,7 @@ export default function ApplicationDetailNav({ applicationId }: Props) {
   }
 
   return (
-    <nav className="flex gap-1 overflow-x-auto">
+    <nav className="flex flex-wrap gap-1 border-b border-border">
       {TABS.map((tab) => {
         const active = isActive(tab.href);
         return (
