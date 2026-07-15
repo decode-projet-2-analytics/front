@@ -16,9 +16,10 @@ interface Props {
   applicationId: number;
   tunnels: Tunnel[];
   tags: Tag[];
+  canManage: boolean;
 }
 
-export default function TunnelList({ applicationId, tunnels, tags }: Props) {
+export default function TunnelList({ applicationId, tunnels, tags, canManage }: Props) {
   const t = useTranslations("Applications.detail.tunnels");
   const tApp = useTranslations("Applications");
   const router = useRouter();
@@ -137,7 +138,7 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
               >
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0 flex-1 space-y-2">
-                    {isRenaming ? (
+                    {canManage && isRenaming ? (
                       <div className="flex flex-wrap items-end gap-2">
                         <label className="flex min-w-[14rem] flex-1 flex-col gap-1">
                           <span className="text-xs font-medium text-foreground-muted">
@@ -178,17 +179,19 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
                         <h3 className="text-base font-semibold truncate">
                           {tunnel.name}
                         </h3>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setRenamingId(tunnel.id);
-                            setDraftName(tunnel.name);
-                            setConfirmArchiveId(null);
-                          }}
-                          className="rounded px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/10"
-                        >
-                          {t("rename")}
-                        </button>
+                        {canManage && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setRenamingId(tunnel.id);
+                              setDraftName(tunnel.name);
+                              setConfirmArchiveId(null);
+                            }}
+                            className="rounded px-2 py-0.5 text-xs font-medium text-primary hover:bg-primary/10"
+                          >
+                            {t("rename")}
+                          </button>
+                        )}
                       </div>
                     )}
 
@@ -207,7 +210,7 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-2 items-center">
+                  {canManage && <div className="flex flex-wrap gap-2 items-center">
                     {confirmArchiveId === tunnel.id ? (
                       <>
                         <span className="text-xs text-foreground-muted">
@@ -241,7 +244,7 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
                         {t("archive")}
                       </button>
                     )}
-                  </div>
+                  </div>}
                 </div>
 
                 <div className="space-y-2 border-t border-border pt-4">
@@ -251,7 +254,7 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
                   <TunnelStepEditor
                     tagIds={orderedIds}
                     tags={tags}
-                    disabled={isPending}
+                    disabled={isPending || !canManage}
                     onChange={(nextIds) => persistSteps(tunnel, nextIds)}
                   />
                 </div>
@@ -263,7 +266,7 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
 
       {error && <p className="text-sm text-error">{error}</p>}
 
-      <form
+      {canManage && <form
         onSubmit={handleCreate}
         className="rounded-lg border border-dashed border-border bg-surface-0 p-4 space-y-4"
       >
@@ -301,7 +304,7 @@ export default function TunnelList({ applicationId, tunnels, tags }: Props) {
           {t("createSubmit")}
         </button>
         {createError && <p className="text-sm text-error">{createError}</p>}
-      </form>
+      </form>}
     </div>
   );
 }

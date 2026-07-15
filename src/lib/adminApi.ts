@@ -1,6 +1,10 @@
 "use server";
 
 import { apiFetch } from "./api";
+import {
+  startImpersonationServer,
+  stopImpersonationServer,
+} from "./auth";
 
 export type UserStatus = "pending" | "validated" | "rejected";
 
@@ -31,14 +35,23 @@ export async function fetchAdminUsers(status?: UserStatus): Promise<AdminUser[]>
   return res.json();
 }
 
-export async function impersonateUser(
+export async function startImpersonation(
   userId: number
-): Promise<{ token: string } | null> {
+): Promise<{ ok: boolean; message?: string }> {
   const res = await apiFetch(`/admin/impersonate/${userId}`, {
     method: "POST",
   });
-  if (!res.ok) return null;
-  return res.json();
+  if (!res.ok) return { ok: false, message: `Erreur API ${res.status}` };
+
+  const data = (await res.json()) as { token?: string };
+  if (!data.token || !(await startImpersonationServer(data.token))) {
+    return { ok: false, message: "Impossible d'activer l'impersonation" };
+  }
+  return { ok: true };
+}
+
+export async function stopImpersonation(): Promise<{ ok: boolean }> {
+  return { ok: await stopImpersonationServer() };
 }
 
 export async function updateUserStatus(

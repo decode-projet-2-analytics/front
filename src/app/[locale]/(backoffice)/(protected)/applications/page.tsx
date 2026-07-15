@@ -1,18 +1,69 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import { fetchApplicationRole, fetchApplications } from "@/lib/applicationsApi";
+import { fetchApplications } from "@/lib/applicationsApi";
 import { fetchMe } from "@/lib/userApi";
 import CreateApplicationForm from "@/components/applications/CreateApplicationForm";
-import ApplicationSecretActions from "@/components/applications/ApplicationSecretActions";
 import { fetchTags } from "@/lib/tagsApi";
 import { fetchTunnels } from "@/lib/tunnelsApi";
+import { getServerRole } from "@/lib/auth";
 
 export default async function ApplicationsPage() {
-  const [t, me, applications] = await Promise.all([
+  const [t, globalRole, applications] = await Promise.all([
     getTranslations("Applications"),
-    fetchMe(),
+    getServerRole(),
     fetchApplications(),
   ]);
+
+  if (globalRole === "Admin") {
+    return (
+      <div className="flex flex-1 flex-col px-6 py-8 max-w-5xl mx-auto w-full gap-6">
+        <div>
+          <h1 className="text-2xl font-semibold">{t("title")}</h1>
+          <p className="text-sm text-foreground-secondary mt-1">
+            {t("adminInventorySubtitle")}
+          </p>
+        </div>
+        {applications.length === 0 ? (
+          <p className="text-sm text-foreground-muted">{t("noApplications")}</p>
+        ) : (
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-surface-2 text-left text-foreground-muted">
+                <tr>
+                  <th className="px-4 py-3 font-medium">{t("name")}</th>
+                  <th className="px-4 py-3 font-medium">{t("appId")}</th>
+                  <th className="px-4 py-3 font-medium">{t("owner")}</th>
+                  <th className="px-4 py-3 font-medium">{t("createdAt")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {applications.map((application) => {
+                  const ownerName = [application.owner?.firstname, application.owner?.lastname]
+                    .filter(Boolean)
+                    .join(" ");
+                  return (
+                    <tr key={application.id} className="border-t border-border">
+                      <td className="px-4 py-3 font-medium">{application.name}</td>
+                      <td className="px-4 py-3 font-mono text-xs">{application.appId}</td>
+                      <td className="px-4 py-3">
+                        <span className="block">{ownerName || application.owner?.companyName || "—"}</span>
+                        <span className="text-xs text-foreground-muted">{application.owner?.email}</span>
+                      </td>
+                      <td className="px-4 py-3 text-foreground-muted">
+                        {new Date(application.createdAt).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const me = await fetchMe();
 
   const counts = await Promise.all(
     applications.map(async (application) => {
@@ -30,14 +81,6 @@ export default async function ApplicationsPage() {
   );
 
   const countById = new Map(counts.map((c) => [c.id, c]));
-  const roles = await Promise.all(
-    applications.map(async (application) => ({
-      id: application.id,
-      role: await fetchApplicationRole(application.id),
-    })),
-  );
-  const roleByApplication = new Map(roles.map((item) => [item.id, item.role]));
-
   const canCreateApplication =
     applications.length === 0 ||
     applications.some((application) => application.ownerId === me?.id);

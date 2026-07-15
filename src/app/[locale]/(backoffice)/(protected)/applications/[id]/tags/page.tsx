@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { fetchApplication } from "@/lib/applicationsApi";
+import { fetchApplication, fetchApplicationRole } from "@/lib/applicationsApi";
 import { fetchTags } from "@/lib/tagsApi";
 import TagTable from "@/components/applications/TagTable";
 
@@ -13,12 +13,13 @@ export default async function ApplicationTagsPage({ params }: Props) {
   const applicationId = Number(id);
   if (!Number.isFinite(applicationId)) notFound();
 
-  const [application, tags, t] = await Promise.all([
+  const [application, role, tags, t] = await Promise.all([
     fetchApplication(applicationId),
+    fetchApplicationRole(applicationId),
     fetchTags(applicationId),
     getTranslations("Applications.detail.tags"),
   ]);
-  if (!application) notFound();
+  if (!application || !role) notFound();
 
   return (
     <div className="space-y-4">
@@ -26,7 +27,11 @@ export default async function ApplicationTagsPage({ params }: Props) {
         <h2 className="text-lg font-medium">{t("title")}</h2>
         <p className="text-sm text-foreground-secondary mt-1">{t("subtitle")}</p>
       </div>
-      <TagTable applicationId={application.id} tags={tags} />
+      <TagTable
+        applicationId={application.id}
+        tags={tags}
+        canManage={role === "owner" || role === "admin"}
+      />
     </div>
   );
 }

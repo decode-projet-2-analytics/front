@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { fetchApplication } from "@/lib/applicationsApi";
+import { fetchApplication, fetchApplicationRole } from "@/lib/applicationsApi";
 import { fetchTags } from "@/lib/tagsApi";
 import { fetchTunnels } from "@/lib/tunnelsApi";
 import TunnelList from "@/components/applications/TunnelList";
@@ -14,13 +14,14 @@ export default async function ApplicationTunnelsPage({ params }: Props) {
   const applicationId = Number(id);
   if (!Number.isFinite(applicationId)) notFound();
 
-  const [application, tags, tunnels, t] = await Promise.all([
+  const [application, role, tags, tunnels, t] = await Promise.all([
     fetchApplication(applicationId),
+    fetchApplicationRole(applicationId),
     fetchTags(applicationId),
     fetchTunnels(applicationId),
     getTranslations("Applications.detail.tunnels"),
   ]);
-  if (!application) notFound();
+  if (!application || !role) notFound();
 
   return (
     <div className="space-y-4">
@@ -32,6 +33,7 @@ export default async function ApplicationTunnelsPage({ params }: Props) {
         applicationId={application.id}
         tunnels={tunnels}
         tags={tags}
+        canManage={role === "owner" || role === "admin"}
       />
     </div>
   );

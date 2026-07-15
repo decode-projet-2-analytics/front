@@ -3,8 +3,7 @@
 import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { impersonateUser } from "@/lib/adminApi";
-import { setImpersonateToken } from "@/lib/auth";
+import { startImpersonation } from "@/lib/adminApi";
 
 interface Props {
   userId: number;
@@ -18,14 +17,13 @@ export default function ImpersonateButton({ userId }: Props) {
 
   async function handleImpersonate() {
     setError(null);
-    const data = await impersonateUser(userId);
-    if (!data) {
+    const result = await startImpersonation(userId);
+    if (!result.ok) {
       setError(t("error"));
       return;
     }
-    setImpersonateToken(data.token);
     startTransition(() => {
-      router.replace("/");
+      router.replace("/dashboard");
       router.refresh();
     });
   }

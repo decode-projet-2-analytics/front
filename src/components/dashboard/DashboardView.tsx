@@ -11,6 +11,7 @@ import AddWidgetModal from "./builder/AddWidgetModal";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 import { useAnalyticsSocket } from "./hooks/useAnalyticsSocket";
 import { useWidgetPolling } from "./hooks/useWidgetPolling";
+import { getApplicationCapabilities } from "@/lib/application-permissions.mjs";
 
 const EMPTY_WIDGET_DATA: Record<number, unknown> = {};
 
@@ -39,7 +40,10 @@ export default function DashboardView({
   const pollTick = useWidgetPolling(isLiveConnected ? 0 : 10_000);
 
   const applicationRole = applicationId ? roleByApplication[applicationId] : null;
-  const canManageWidgets = applicationRole === "owner" || applicationRole === "admin";
+  const canManageWidgets = getApplicationCapabilities(
+    "Webmaster",
+    applicationRole,
+  ).manage;
   const canAddWidget = applicationId !== null && canManageWidgets;
   const showLive = applicationId !== null;
   const liveDataByWidgetId = isLiveConnected

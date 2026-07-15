@@ -30,6 +30,7 @@ export default function LoginForm({ redirectTo = "/dashboard" }: Props) {
       if (result.error === "pending") {
         startTransition(() => {
           router.replace("/pending");
+          router.refresh();
         });
         return;
       }

@@ -13,9 +13,10 @@ import {
 interface Props {
   applicationId: number;
   tags: Tag[];
+  canManage: boolean;
 }
 
-export default function TagTable({ applicationId, tags }: Props) {
+export default function TagTable({ applicationId, tags, canManage }: Props) {
   const t = useTranslations("Applications.detail.tags");
   const tApp = useTranslations("Applications");
   const router = useRouter();
@@ -128,7 +129,7 @@ export default function TagTable({ applicationId, tags }: Props) {
                     )}
                   </td>
                   <td className="px-4 py-3 align-top">
-                    <div className="flex flex-wrap gap-2 items-center">
+                    {canManage && <div className="flex flex-wrap gap-2 items-center">
                       {editingId === tag.id ? (
                         <>
                           <button
@@ -194,7 +195,7 @@ export default function TagTable({ applicationId, tags }: Props) {
                           {t("archive")}
                         </button>
                       )}
-                    </div>
+                    </div>}
                   </td>
                 </tr>
               ))}
@@ -205,7 +206,7 @@ export default function TagTable({ applicationId, tags }: Props) {
 
       {error && <p className="text-sm text-error">{error}</p>}
 
-      <form
+      {canManage && <form
         onSubmit={handleCreate}
         className="rounded-lg border border-dashed border-border bg-surface-0 p-4 flex flex-col sm:flex-row gap-3 items-start"
       >
@@ -232,7 +233,7 @@ export default function TagTable({ applicationId, tags }: Props) {
         {createError && (
           <p className="text-sm text-error sm:w-full">{createError}</p>
         )}
-      </form>
+      </form>}
     </div>
   );
 }
