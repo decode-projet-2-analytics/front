@@ -86,26 +86,42 @@ export async function setRefreshTokenServer(token: string): Promise<boolean> {
 
 // --- Impersonate ---
 
-export const getAdminToken = () => getCookie(ADMIN_TOKEN_COOKIE);
-
-export const setImpersonateToken = (impersonateToken: string) => {
-  const current = getToken();
-  if (current) {
-    document.cookie = `${ADMIN_TOKEN_COOKIE}=${encodeURIComponent(current)}; path=/; SameSite=Lax`;
-  }
-  setToken(impersonateToken);
-};
-
-export const stopImpersonating = () => {
-  const adminToken = getAdminToken();
-  if (adminToken) setToken(adminToken);
-  document.cookie = `${ADMIN_TOKEN_COOKIE}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-};
-
 export const getAdminTokenServer = async (): Promise<string | undefined> => {
   const { cookies } = await import("next/headers");
   return (await cookies()).get(ADMIN_TOKEN_COOKIE)?.value;
 };
+
+export async function startImpersonationServer(
+  impersonatedToken: string,
+): Promise<boolean> {
+  try {
+    const { cookies } = await import("next/headers");
+    const store = await cookies();
+    const adminToken = store.get(TOKEN_COOKIE)?.value;
+    if (!adminToken) return false;
+
+    store.set(ADMIN_TOKEN_COOKIE, adminToken, { path: "/", sameSite: "lax" });
+    store.set(TOKEN_COOKIE, impersonatedToken, { path: "/", sameSite: "lax" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function stopImpersonationServer(): Promise<boolean> {
+  try {
+    const { cookies } = await import("next/headers");
+    const store = await cookies();
+    const adminToken = store.get(ADMIN_TOKEN_COOKIE)?.value;
+    if (!adminToken) return false;
+
+    store.set(TOKEN_COOKIE, adminToken, { path: "/", sameSite: "lax" });
+    store.delete(ADMIN_TOKEN_COOKIE);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 function decodeJwtPayload(token: string): Record<string, unknown> {
   return JSON.parse(

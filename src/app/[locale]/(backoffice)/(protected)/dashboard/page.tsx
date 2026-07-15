@@ -5,16 +5,25 @@ import {
 } from "@/lib/applicationsApi";
 import { getDefaultApplicationId } from "@/lib/env";
 import DashboardView from "@/components/dashboard/DashboardView";
+import { getServerRole } from "@/lib/auth";
+import { getLocale } from "next-intl/server";
+import { redirect } from "@/i18n/navigation";
 
 interface Props {
   searchParams: Promise<{ applicationId?: string }>;
 }
 
 export default async function DashboardPage({ searchParams }: Props) {
-  const [applications, params] = await Promise.all([
+  const [globalRole, locale, applications, params] = await Promise.all([
+    getServerRole(),
+    getLocale(),
     fetchApplications(),
     searchParams,
   ]);
+
+  if (globalRole === "Admin") {
+    redirect({ href: "/applications", locale });
+  }
 
   const requestedId = Number(params.applicationId);
   const defaultApplicationId =

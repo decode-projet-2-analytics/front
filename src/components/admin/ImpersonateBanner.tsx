@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { stopImpersonating } from "@/lib/auth";
+import { stopImpersonation } from "@/lib/adminApi";
 
 interface Props {
   email: string;
@@ -12,9 +12,10 @@ export default function ImpersonateBanner({ email }: Props) {
   const t = useTranslations("Admin.impersonate");
   const router = useRouter();
 
-  function handleStop() {
-    stopImpersonating();
-    router.replace("/");
+  async function handleStop() {
+    const result = await stopImpersonation();
+    if (!result.ok) return;
+    router.replace("/admin/users");
     router.refresh();
   }
 

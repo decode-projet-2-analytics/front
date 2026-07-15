@@ -34,7 +34,7 @@ L'onglet affiche :
 
 - le proprietaire de l'application ;
 - les membres actifs ;
-- leur role applicatif (`owner`, `admin`, `member`, `viewer`) ;
+- leur role applicatif (`owner`, `admin`, `member`) ;
 - les invitations en attente pour `owner/admin`.
 
 Permissions UI :
@@ -44,15 +44,16 @@ Permissions UI :
 | `owner` | oui | oui | oui | oui |
 | `admin` | oui | oui | oui | oui |
 | `member` | oui | non | non | non |
-| `viewer` | oui | non | non | non |
 
 Le lien d'invitation permet a un utilisateur non connecte de se connecter ou de s'inscrire. En inscription invitee, le token est conserve dans l'URL puis envoye a l'API pour rattacher automatiquement le compte a l'application.
 
 ### Dashboard et applications pour les membres
 
 - Le dashboard affiche le role applicatif de l'application courante, et non le role global `Webmaster`.
-- `member` et `viewer` peuvent consulter les widgets.
+- `member` peut consulter les widgets en lecture seule.
 - Seuls `owner/admin` voient le bouton d'ajout de widget, les menus de configuration, suppression, edition et le drag reorder.
+- Seul `owner` peut modifier ou supprimer les sessions et supprimer l'application.
+- L'Admin global voit uniquement l'inventaire de base des applications ; il doit impersonifier un webmaster pour ouvrir un detail.
 - Un compte qui est uniquement membre invite ne voit pas le formulaire de creation d'application.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

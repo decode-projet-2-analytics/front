@@ -10,6 +10,13 @@ export interface Application {
   allowedUrls: string[];
   hasSecret: boolean;
   ownerId: number;
+  owner?: {
+    id: number;
+    email: string;
+    firstname: string | null;
+    lastname: string | null;
+    companyName: string | null;
+  };
   createdAt: string;
   updatedAt: string;
 }
