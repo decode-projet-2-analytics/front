@@ -28,7 +28,6 @@ import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
   canManageWidget: boolean;
   liveData?: unknown;
   onDeleted: () => void;
@@ -37,12 +36,10 @@ interface Props {
 
 function WidgetContent({
   widget,
-  refreshKey,
   liveData,
   onUpdated,
 }: {
   widget: Widget;
-  refreshKey: number;
   liveData: unknown;
   onUpdated: () => void;
 }) {
@@ -51,7 +48,6 @@ function WidgetContent({
       return (
         <EventsWidget
           widget={widget}
-          refreshKey={refreshKey}
           liveData={liveData as EventsWidgetData | null}
         />
       );
@@ -59,7 +55,6 @@ function WidgetContent({
       return (
         <MouseHeatmapWidget
           widget={widget}
-          refreshKey={refreshKey}
           liveData={liveData as MouseHeatmapLiveData | null}
           onConfigPatched={onUpdated}
         />
@@ -68,7 +63,6 @@ function WidgetContent({
       return (
         <FunnelWidget
           widget={widget}
-          refreshKey={refreshKey}
           liveData={liveData as FunnelWidgetData | null}
         />
       );
@@ -76,7 +70,6 @@ function WidgetContent({
       return (
         <BreakdownWidget
           widget={widget}
-          refreshKey={refreshKey}
           liveData={liveData as BreakdownWidgetData | null}
         />
       );
@@ -84,18 +77,16 @@ function WidgetContent({
       return (
           <ScrollDepthWidget
               widget={widget}
-              refreshKey={refreshKey}
               liveData={liveData as ScrollDepthWidgetData | null}
           />
       );
       case "retention":
-      return <RetentionWidget widget={widget} refreshKey={refreshKey} />;
+      return <RetentionWidget widget={widget} />;
   }
 }
 
 export default function WidgetCard({
   widget,
-  refreshKey = 0,
   canManageWidget,
   liveData = null,
   onDeleted,
@@ -283,7 +274,6 @@ export default function WidgetCard({
           <div data-widget-measure className="flex h-full min-h-0 flex-col">
             <WidgetContent
               widget={widget}
-              refreshKey={refreshKey}
               liveData={liveData}
               onUpdated={onUpdated}
             />

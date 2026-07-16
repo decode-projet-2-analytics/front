@@ -11,7 +11,6 @@ import { WidgetContentSkeleton } from "../WidgetSkeleton";
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
 }
 
 function isRetentionData(data: unknown): data is RetentionWidgetData {
@@ -24,7 +23,7 @@ function isRetentionData(data: unknown): data is RetentionWidgetData {
   );
 }
 
-export default function RetentionWidget({ widget, refreshKey = 0 }: Props) {
+export default function RetentionWidget({ widget }: Props) {
   const t = useTranslations("Dashboard");
   const [data, setData] = useState<RetentionWidgetData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +49,7 @@ export default function RetentionWidget({ widget, refreshKey = 0 }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [widget.id, widget.updatedAt, refreshKey]);
+  }, [widget.id, widget.updatedAt]);
 
   if (loading && !data) {
     return <WidgetContentSkeleton type="retention" />;

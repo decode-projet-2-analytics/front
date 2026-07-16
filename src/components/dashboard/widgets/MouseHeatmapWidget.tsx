@@ -46,7 +46,6 @@ export interface MouseHeatmapLiveData {
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
   liveData?: MouseHeatmapLiveData | null;
   onConfigPatched?: () => void;
 }
@@ -176,7 +175,6 @@ function drawHeatmap(canvas: HTMLCanvasElement, bucket: Bucketed): void {
 
 export default function MouseHeatmapWidget({
   widget,
-  refreshKey = 0,
   liveData = null,
   onConfigPatched,
 }: Props) {
@@ -264,7 +262,7 @@ export default function MouseHeatmapWidget({
     };
     // Intentionally omit widget.config: auto-select must not patch+refresh in a loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- persist only via user actions
-  }, [applicationId, period, refreshKey]);
+  }, [applicationId, period]);
 
   // 2) Load the movements for the selected page and bucket them for drawing.
   useEffect(() => {
@@ -307,7 +305,7 @@ export default function MouseHeatmapWidget({
     return () => {
       cancelled = true;
     };
-  }, [applicationId, selectedPage, period, refreshKey]);
+  }, [applicationId, selectedPage, period]);
 
   // 2b) Apply a live socket push directly (no refetch) when it matches the
   // period/page currently shown; stale payloads (e.g. from before a config

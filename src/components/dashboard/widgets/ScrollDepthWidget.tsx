@@ -11,7 +11,6 @@ import { WidgetContentSkeleton } from "../WidgetSkeleton";
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
   liveData?: ScrollDepthWidgetData | null;
 }
 
@@ -27,7 +26,6 @@ function isScrollDepthData(data: unknown): data is ScrollDepthWidgetData {
 
 export default function ScrollDepthWidget({
   widget,
-  refreshKey = 0,
   liveData = null,
 }: Props) {
   const t = useTranslations("Dashboard");
@@ -63,7 +61,7 @@ export default function ScrollDepthWidget({
     return () => {
       cancelled = true;
     };
-  }, [widget.id, widget.updatedAt, refreshKey]);
+  }, [widget.id, widget.updatedAt]);
 
   if (loading && !data) {
     return <WidgetContentSkeleton type="scroll_depth" />;

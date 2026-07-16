@@ -12,7 +12,6 @@ import { WidgetContentSkeleton } from "../WidgetSkeleton";
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
   liveData?: BreakdownWidgetData | null;
 }
 
@@ -48,7 +47,6 @@ function formatKey(key: string): string {
 
 export default function BreakdownWidget({
   widget,
-  refreshKey = 0,
   liveData = null,
 }: Props) {
   const t = useTranslations("Dashboard");
@@ -84,7 +82,7 @@ export default function BreakdownWidget({
     return () => {
       cancelled = true;
     };
-  }, [widget.id, widget.updatedAt, refreshKey]);
+  }, [widget.id, widget.updatedAt]);
 
   if (loading && !data) {
     return <WidgetContentSkeleton type="breakdown" />;

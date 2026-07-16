@@ -10,7 +10,6 @@ import WidgetGrid from "./WidgetGrid";
 import AddWidgetModal from "./builder/AddWidgetModal";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
 import { useAnalyticsSocket } from "./hooks/useAnalyticsSocket";
-import { useWidgetPolling } from "./hooks/useWidgetPolling";
 import { getApplicationCapabilities } from "@/lib/application-permissions.mjs";
 
 const EMPTY_WIDGET_DATA: Record<number, unknown> = {};
@@ -37,9 +36,10 @@ export default function DashboardView({
   const { connectionState, dataByWidgetId, lastPushAt } =
     useAnalyticsSocket(applicationId);
   const isLiveConnected = connectionState === "connected";
-  const pollTick = useWidgetPolling(isLiveConnected ? 0 : 10_000);
 
-  const applicationRole = applicationId ? roleByApplication[applicationId] : null;
+  const applicationRole = applicationId
+    ? roleByApplication[applicationId]
+    : null;
   const canManageWidgets = getApplicationCapabilities(
     "Webmaster",
     applicationRole,
@@ -71,7 +71,7 @@ export default function DashboardView({
         second: "2-digit",
       }),
     );
-  }, [pollTick, lastPushAt, showLive]);
+  }, [lastPushAt, showLive]);
 
   return (
     <div className="flex flex-1 flex-col">
@@ -163,9 +163,8 @@ export default function DashboardView({
       <div className="mx-auto w-full max-w-6xl px-6 py-8">
         <WidgetGrid
           applicationId={applicationId}
-        canManageWidgets={canManageWidgets}
+          canManageWidgets={canManageWidgets}
           refreshToken={gridRefresh}
-          pollTick={pollTick}
           dataByWidgetId={liveDataByWidgetId}
           onRefresh={() => setGridRefresh((n) => n + 1)}
         />

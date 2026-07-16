@@ -10,7 +10,6 @@ interface Props {
   applicationId: number | null;
   canManageWidgets: boolean;
   refreshToken?: number;
-  pollTick?: number;
   dataByWidgetId?: Record<number, unknown>;
   onRefresh?: () => void;
 }
@@ -19,7 +18,6 @@ export default function WidgetGrid({
   applicationId,
   canManageWidgets,
   refreshToken = 0,
-  pollTick = 0,
   dataByWidgetId,
   onRefresh,
 }: Props) {
@@ -90,7 +88,6 @@ export default function WidgetGrid({
   return (
     <DashboardGrid
       widgets={widgets}
-      refreshKey={pollTick}
       canManageWidget={canManageWidgets}
       dataByWidgetId={dataByWidgetId}
       onRefresh={onRefresh}

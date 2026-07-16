@@ -21,7 +21,6 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
   liveData?: FunnelWidgetData | null;
 }
 
@@ -43,7 +42,6 @@ function hasFunnelSessions(data: FunnelWidgetData): boolean {
 
 export default function FunnelWidget({
   widget,
-  refreshKey = 0,
   liveData = null,
 }: Props) {
   const t = useTranslations("Dashboard");
@@ -78,7 +76,7 @@ export default function FunnelWidget({
     return () => {
       cancelled = true;
     };
-  }, [widget.id, widget.updatedAt, refreshKey, liveData, t]);
+  }, [widget.id, widget.updatedAt, liveData, t]);
 
   const chartData = useMemo(() => {
     if (!data) return null;

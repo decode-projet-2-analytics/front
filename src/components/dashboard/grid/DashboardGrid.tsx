@@ -41,7 +41,6 @@ type GridLayoutItems = Layout;
 
 interface Props {
   widgets: Widget[];
-  refreshKey: number;
   canManageWidget?: boolean;
   dataByWidgetId?: Record<number, unknown>;
   onRefresh?: () => void;
@@ -138,7 +137,6 @@ function withGridConstraints(items: GridLayoutItems): GridLayoutItem[] {
 
 export default function DashboardGrid({
   widgets,
-  refreshKey,
   canManageWidget = true,
   dataByWidgetId,
   onRefresh,
@@ -309,7 +307,6 @@ export default function DashboardGrid({
         >
           <WidgetCard
             widget={widget}
-            refreshKey={refreshKey}
             canManageWidget={canManageWidget}
             liveData={dataByWidgetId?.[widget.id] ?? null}
             onDeleted={() => onRefresh?.()}

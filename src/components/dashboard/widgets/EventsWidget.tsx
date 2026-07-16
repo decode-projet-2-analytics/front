@@ -56,7 +56,6 @@ const CHART_COLORS = [
 
 interface Props {
   widget: Widget;
-  refreshKey?: number;
   liveData?: EventsWidgetData | null;
 }
 
@@ -210,7 +209,6 @@ function categoricalColors(count: number): string[] {
 
 export default function EventsWidget({
   widget,
-  refreshKey = 0,
   liveData = null,
 }: Props) {
   const t = useTranslations("Dashboard");
@@ -238,7 +236,7 @@ export default function EventsWidget({
     return () => {
       cancelled = true;
     };
-  }, [widget.id, widget.updatedAt, refreshKey]);
+  }, [widget.id, widget.updatedAt]);
 
   useEffect(() => {
     if (liveData && isEventsData(liveData)) {
