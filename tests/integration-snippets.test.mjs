@@ -11,7 +11,7 @@ const snippets = buildIntegrationSnippets({
 
 describe('integration snippets', () => {
   it('uses the unified package and the browser endpoint', () => {
-    assert.equal(snippets.install, 'npm install @analytics/sdk');
+    assert.equal(snippets.install, 'npm install @decode-analytics/sdk@0.1.0');
     assert.match(snippets.browserEnv, /NEXT_PUBLIC_ANALYTICS_APP_ID=app_public_123/);
     assert.match(snippets.browserCode, /@analytics\/sdk\/browser/);
     assert.match(snippets.browserCode, /\/collect/);

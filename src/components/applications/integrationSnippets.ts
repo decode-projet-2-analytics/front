@@ -20,7 +20,7 @@ export function buildIntegrationSnippets({
   const normalizedApiUrl = apiBaseUrl.replace(/\/$/, "");
 
   return {
-    install: "npm install @analytics/sdk",
+    install: "npm install @decode-analytics/sdk@0.1.0",
     browserEnv: `NEXT_PUBLIC_ANALYTICS_APP_ID=${appId}
 NEXT_PUBLIC_ANALYTICS_API_URL=${normalizedApiUrl}`,
     browserCode: `import { init, track, getSessionId } from "@analytics/sdk/browser";
