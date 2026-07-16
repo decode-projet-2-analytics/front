@@ -24,7 +24,6 @@ import BreakdownWidget from "./widgets/BreakdownWidget";
 import ScrollDepthWidget from "./widgets/ScrollDepthWidget";
 import RetentionWidget from "./widgets/RetentionWidget";
 import WidgetConfigModal from "./builder/WidgetConfigModal";
-import EditWidgetTitleModal from "./builder/EditWidgetTitleModal";
 
 interface Props {
   widget: Widget;
@@ -96,7 +95,6 @@ export default function WidgetCard({
   const [isPending, startTransition] = useTransition();
   const [menuOpen, setMenuOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
-  const [editTitleOpen, setEditTitleOpen] = useState(false);
   const [tag, setTag] = useState<Tag | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const isEvents = widget.type === "events";
@@ -234,17 +232,6 @@ export default function WidgetCard({
                     role="menuitem"
                     onClick={() => {
                       setMenuOpen(false);
-                      setEditTitleOpen(true);
-                    }}
-                    className="flex w-full px-3 py-2 text-left text-sm hover:bg-surface-2"
-                  >
-                    {t("edit")}
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    onClick={() => {
-                      setMenuOpen(false);
                       setConfigOpen(true);
                     }}
                     className="flex w-full px-3 py-2 text-left text-sm hover:bg-surface-2"
@@ -295,12 +282,6 @@ export default function WidgetCard({
             open={configOpen}
             widget={widget}
             onClose={() => setConfigOpen(false)}
-            onUpdated={onUpdated}
-          />
-          <EditWidgetTitleModal
-            open={editTitleOpen}
-            widget={widget}
-            onClose={() => setEditTitleOpen(false)}
             onUpdated={onUpdated}
           />
         </>
