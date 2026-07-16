@@ -30,6 +30,8 @@ interface IncomingCallPayload {
 const OUTGOING_TIMEOUT_MS = 45_000;
 
 const TURN_URL = process.env.NEXT_PUBLIC_TURN_URL as string;
+const TURN_USERNAME = process.env.NEXT_PUBLIC_TURN_USERNAME as string;
+const TURN_SECRET = process.env.NEXT_PUBLIC_TURN_SECRET as string;
 
 export function useSupportCall({
   socket,
@@ -93,8 +95,8 @@ export function useSupportCall({
         { urls: "stun:stun.l.google.com:19302" },
         {
           urls: TURN_URL,
-          username: "decode",
-          credential: "rRNkwhyz31FMRDWM8f8OYM6pjx8YY0WgOo9HtsTwVLA=",
+          username: TURN_USERNAME,
+          credential: TURN_SECRET,
         },
       ],
       iceTransportPolicy: "relay",
