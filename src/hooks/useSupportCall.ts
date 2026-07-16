@@ -29,6 +29,8 @@ interface IncomingCallPayload {
 
 const OUTGOING_TIMEOUT_MS = 45_000;
 
+const TURN_URL = process.env.NEXT_PUBLIC_TURN_URL as string;
+
 export function useSupportCall({
   socket,
   conversationId,
@@ -87,7 +89,15 @@ export function useSupportCall({
     if (pcRef.current) return pcRef.current;
 
     const pc = new RTCPeerConnection({
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: TURN_URL,
+          username: "decode",
+          credential: "rRNkwhyz31FMRDWM8f8OYM6pjx8YY0WgOo9HtsTwVLA=",
+        },
+      ],
+      iceTransportPolicy: "relay",
     });
 
     pc.ontrack = (event) => {
@@ -95,6 +105,17 @@ export function useSupportCall({
         setRemoteStream(event.streams[0]);
       }
       setCallState("in-call");
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.info("[call] ICE connection state:", pc.iceConnectionState);
+      if (pc.iceConnectionState === "failed") {
+        setCallError("connectionFailed");
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      console.info("[call] peer connection state:", pc.connectionState);
     };
 
     pc.onicecandidate = (event) => {
