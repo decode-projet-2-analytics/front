@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { shouldShowDashboardNav } from "@/lib/backofficeNavigation.mjs";
 import AdminNavDropdown from "./AdminNavDropdown";
 import Logo from "./Logo";
 
@@ -25,12 +26,14 @@ export default function BackofficeHeader({ isAdmin = false }: Props) {
         <nav className="flex items-center gap-6">
           {showAppNav && (
             <>
-              <Link
-                href="/dashboard"
-                className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
-              >
-                {t("nav.dashboard")}
-              </Link>
+              {shouldShowDashboardNav(isAdmin) && (
+                <Link
+                  href="/dashboard"
+                  className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
+                >
+                  {t("nav.dashboard")}
+                </Link>
+              )}
               <Link
                 href="/applications"
                 className="text-sm text-foreground-secondary transition-colors hover:text-foreground"
