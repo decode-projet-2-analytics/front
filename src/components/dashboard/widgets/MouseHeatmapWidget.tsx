@@ -424,27 +424,31 @@ export default function MouseHeatmapWidget({
           {loadingPoints ? t("mouseHeatmapLoading") : t("mouseHeatmapNoData")}
         </div>
       ) : (
-        <div
-          className="relative min-h-0 w-full flex-1 overflow-hidden rounded-md border border-border-subtle bg-surface-0"
-          style={{
-            aspectRatio: snapshot
-              ? `${snapshot.width} / ${snapshot.height}`
-              : `${bucket.width} / ${bucket.height}`,
-          }}
-        >
-          {snapshot && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={snapshot.image}
-              alt=""
-              className="pointer-events-none absolute inset-0 h-full w-full object-contain"
+        <div className="min-h-0 w-full flex-1 overflow-auto rounded-md border border-border-subtle bg-surface-0">
+          {/* Keeps the tracked page's aspect ratio: full width, height derived
+              from the ratio, so resizing the widget never stretches the image. */}
+          <div
+            className="relative w-full"
+            style={{
+              aspectRatio: snapshot
+                ? `${snapshot.width} / ${snapshot.height}`
+                : `${bucket.width} / ${bucket.height}`,
+            }}
+          >
+            {snapshot && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={snapshot.image}
+                alt=""
+                className="pointer-events-none absolute inset-0 h-full w-full object-fill"
+              />
+            )}
+            {/* heat layer drawn on canvas, over the page screenshot */}
+            <canvas
+              ref={canvasRef}
+              className="pointer-events-none absolute inset-0 h-full w-full"
             />
-          )}
-          {/* heat layer drawn on canvas, over the page screenshot */}
-          <canvas
-            ref={canvasRef}
-            className="pointer-events-none absolute inset-0 h-full w-full"
-          />
+          </div>
         </div>
       )}
 
